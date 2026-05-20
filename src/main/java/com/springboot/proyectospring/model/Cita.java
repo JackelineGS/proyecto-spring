@@ -6,9 +6,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "cita")
 public class Cita {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
 
     // Relaciones (sin JPA): la cita es el puente entre paciente y servicio.
     private Long pacienteId;
@@ -27,7 +38,11 @@ public class Cita {
     private LocalDateTime creadoEn;
 
     // En la práctica puede haber múltiples pagos por cita.
+    // (JPA: la relación se maneja desde Pago.cita)
     private List<Pago> pagos = new ArrayList<>();
+
+
+
 
     public Long getId() {
         return id;

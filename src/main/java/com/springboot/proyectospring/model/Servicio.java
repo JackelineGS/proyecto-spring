@@ -1,12 +1,31 @@
 package com.springboot.proyectospring.model;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+
+@Entity
+@Table(name = "servicio")
 public class Servicio {
 
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String nombre;
     private String descripcion;
+    @Enumerated(EnumType.STRING)
     private TipoServicio tipo;
+
+    @Enumerated(EnumType.STRING)
     private PaqueteSesion paquete;
+
     private Double precio;
     private String duracion;
     private String formato;

@@ -9,9 +9,20 @@ import com.springboot.proyectospring.model.historiaclinica.Diagnostico;
 import com.springboot.proyectospring.model.historiaclinica.Evaluaciones;
 import com.springboot.proyectospring.model.historiaclinica.Psicofarmaco;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "historia_clinica")
 public class HistoriaClinica {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
 
     // Relación 1 a 1 (en términos del modelo): la historia pertenece a un paciente.
     private Long pacienteId;

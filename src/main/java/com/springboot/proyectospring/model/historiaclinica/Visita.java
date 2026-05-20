@@ -4,17 +4,30 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "visita")
 public class Visita {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+
     // Puente: la visita ocurre en el calendario y corresponde a una Cita administrativa.
+
     private Long citaId;
 
     // Para el consultorio
     private Long especialistaId;
 
     private Long historiaClinicaId;
+
 
     // Para identificar sesión del paquete
     private int numeroSesion;

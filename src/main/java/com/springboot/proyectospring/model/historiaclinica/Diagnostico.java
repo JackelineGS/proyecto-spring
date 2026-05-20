@@ -3,9 +3,20 @@ package com.springboot.proyectospring.model.historiaclinica;
 import java.time.LocalDate;
 import java.util.Objects;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "diagnostico")
 public class Diagnostico {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private Long historiaClinicaId;
 
     private String codigo; // ej F41.1

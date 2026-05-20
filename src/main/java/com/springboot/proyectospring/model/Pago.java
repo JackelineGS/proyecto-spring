@@ -3,17 +3,34 @@ package com.springboot.proyectospring.model;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "pago")
 public class Pago {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Relación (sin JPA): el pago pertenece a una cita.
-    private Long citaId;
+    // Relación: el pago pertenece a una cita.
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cita_id", nullable = false)
+    private Cita cita;
+
 
     private LocalDateTime fecha;
 
     // efectivo, tarjeta, transferencia
     private String medioPago;
+
 
     private Double monto;
 
@@ -29,13 +46,15 @@ public class Pago {
         this.id = id;
     }
 
-    public Long getCitaId() {
-        return citaId;
+    public Cita getCita() {
+        return cita;
     }
 
-    public void setCitaId(Long citaId) {
-        this.citaId = citaId;
+    public void setCita(Cita cita) {
+        this.cita = cita;
     }
+
+
 
     public LocalDateTime getFecha() {
         return fecha;

@@ -1,35 +1,22 @@
-# TODO - Historia Clínica (persistencia + endpoints)
+# TODO - H2 (configuración) paso a paso
 
-## Paso 1
-Implementar modelos de Historia Clínica y módulos relacionados:
-- HistoriaClinica ✅
-- Anamnesis (1:1) ✅
-- Diagnostico (1:N) ✅
-- Visita (1:N) ✅
-- Psicofarmaco (1:N) ✅
-- Evaluaciones (1:N) ✅
+## Paso 1 (hecho/para confirmar)
+- Revisar `pom.xml` y decidir dependencias para usar H2 con Spring JDBC (sin implementar tablas todavía).
 
 ## Paso 2
-Implementar `HistoriaClinicaRepository` en memoria (CRUD + búsqueda por id).
-(ya implementado en el código)
-
-
+- Agregar dependencias al `pom.xml`:
+  - `com.h2database:h2`
+  - `spring-boot-starter-jdbc`
 
 ## Paso 3
-Implementar `HistoriaClinicaService` (crear/guardar/obtener).
+- Configurar `application.properties` para:
+  - URL H2 en memoria
+  - driver
+  - `spring.sql.init.mode=never` (para NO crear tablas aún)
 
 ## Paso 4
-Implementar `HistoriaClinicaController` con endpoints REST:
-- GET /api/historias/{id}
-- POST /api/historias (crear/actualizar)
-- (opcional) GET /api/historias por dni si lo definimos.
+- Crear carpetas/archivos de configuración si hiciera falta (sin `schema.sql` aún).
 
 ## Paso 5
-Aplicar JPA + H2 disco (no solo Historia Clínica):
-- pom.xml ✅
-- application.properties ✅
-
-## Paso 6
-Convertir modelos a `@Entity` por bloques (Paciente/Especialista/Servicio/Horario primero), reemplazar repos por `JpaRepository` y ajustar `DatosIniciales`.
-
+- Lanzar app para validar que levanta con H2 sin tablas (solo conexión).
 

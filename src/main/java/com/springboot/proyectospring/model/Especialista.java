@@ -3,14 +3,36 @@ package com.springboot.proyectospring.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "especialista")
 public class Especialista {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String nombre;
     private String titulo;
+
+    @ElementCollection
+    @CollectionTable(name = "especialista_formacion", joinColumns = @JoinColumn(name = "especialista_id"))
     private List<String> formacion = new ArrayList<>();
+
     private String colegiatura;
+
+    @ElementCollection
+    @CollectionTable(name = "especialista_especialidades", joinColumns = @JoinColumn(name = "especialista_id"))
     private List<String> especialidades = new ArrayList<>();
+
     private String fotoUrl;
     private String descripcionResumen;
 
@@ -57,6 +79,7 @@ public class Especialista {
         this.colegiatura = colegiatura;
     }
 
+
     public List<String> getEspecialidades() {
         return especialidades;
     }
@@ -89,3 +112,4 @@ public class Especialista {
         return String.join("||", especialidades);
     }
 }
+
