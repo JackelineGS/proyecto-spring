@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:replace="~{fragments/layout :: head('Servicios')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: nav('servicios')}"></div>
+
+<main>
+    <section class="page-header">
+        <div class="container">
+            <h1>Consultorio de Salud Mental</h1>
+            <p>Consultas Online y Presencial</p>
+            <a href="https://wa.me/51923826177" class="btn btn-outline" target="_blank" rel="noopener">Solicitar información</a>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <h2 class="section-center" style="margin-bottom: 3rem;">Nuestros servicios</h2>
+            <div class="grid-4">
+                <article class="card" th:each="servicio : ${serviciosGenerales}">
+                    <div class="card-media">
+                        <img th:src="${servicio.imagenUrl}" th:alt="${servicio.nombre}">
+                    </div>
+                    <div class="card-body">
+                        <h3 th:text="${servicio.nombre}">Servicio</h3>
+                        <p th:text="${servicio.descripcion}">Descripción</p>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <section class="section section-muted">
+        <div class="container">
+            <h2 class="section-center" style="margin-bottom: 2.5rem;">Servicios únicos y paquetes</h2>
+            <div class="tabs">
+                <button type="button" class="tab-btn active" data-tab="1">1 Sesión</button>
+                <button type="button" class="tab-btn" data-tab="4">Paquete 4 sesiones</button>
+                <button type="button" class="tab-btn" data-tab="10">Paquete 10 sesiones</button>
+            </div>
+
+            <div class="tab-panel active" data-panel="1">
+                <div class="grid-4">
+                    <article class="card" th:each="s : ${serviciosUnaSesion}">
+                        <div class="card-media card-media--wide">
+                            <img th:src="${s.imagenUrl}" th:alt="${s.nombre}">
+                        </div>
+                        <div class="card-body" style="display:flex;flex-direction:column;gap:0.75rem;flex:1;">
+                            <h3 th:text="${s.nombre}">Servicio</h3>
+                            <p class="price" th:text="'S/. ' + ${s.precio}">S/. 0</p>
+                            <p class="text-muted" th:text="${s.detalle}">Detalle</p>
+                            <a th:href="@{/reservar/{id}(id=${s.id})}" class="btn btn-primary btn-block" style="margin-top:auto;">Reservar Hoy</a>
+                        </div>
+                    </article>
+                </div>
+            </div>
+
+            <div class="tab-panel" data-panel="4">
+                <div class="grid-4">
+                    <article class="card" th:each="s : ${serviciosCuatro}">
+                        <div class="card-media card-media--wide">
+                            <img th:src="${s.imagenUrl}" th:alt="${s.nombre}">
+                        </div>
+                        <div class="card-body" style="display:flex;flex-direction:column;gap:0.75rem;flex:1;">
+                            <h3 th:text="${s.nombre}">Servicio</h3>
+                            <p class="price" th:text="'S/. ' + ${s.precio}">S/. 0</p>
+                            <p class="text-muted" th:text="${s.detalle}">Detalle</p>
+                            <a th:href="@{/reservar/{id}(id=${s.id})}" class="btn btn-primary btn-block" style="margin-top:auto;">Reservar Hoy</a>
+                        </div>
+                    </article>
+                </div>
+            </div>
+
+            <div class="tab-panel" data-panel="10">
+                <div class="grid-4">
+                    <article class="card" th:each="s : ${serviciosDiez}">
+                        <div class="card-media card-media--wide">
+                            <img th:src="${s.imagenUrl}" th:alt="${s.nombre}">
+                        </div>
+                        <div class="card-body" style="display:flex;flex-direction:column;gap:0.75rem;flex:1;">
+                            <h3 th:text="${s.nombre}">Servicio</h3>
+                            <p class="price" th:text="'S/. ' + ${s.precio}">S/. 0</p>
+                            <p class="text-muted" th:text="${s.detalle}">Detalle</p>
+                            <a th:href="@{/reservar/{id}(id=${s.id})}" class="btn btn-primary btn-block" style="margin-top:auto;">Reservar Hoy</a>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

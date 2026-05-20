@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:replace="~{fragments/layout :: head('Profesionales')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: nav('profesionales')}"></div>
+
+<main class="section">
+    <div class="container">
+        <h1 class="section-center" style="margin-bottom: 3rem;">Nuestros Especialistas</h1>
+        <div class="pro-grid">
+            <button type="button"
+                    class="pro-card"
+                    th:each="e : ${especialistas}"
+                    th:attr="data-nombre=${e.nombre},
+                             data-titulo=${e.titulo},
+                             data-colegiatura=${e.colegiatura},
+                             data-foto=${e.fotoUrl},
+                             data-formacion=${e.formacionJoin},
+                             data-especialidades=${e.especialidadesJoin}"
+                    onclick="abrirEspecialista(this)">
+                <div class="pro-card-media">
+                    <img th:src="${e.fotoUrl}" th:alt="${e.nombre}">
+                </div>
+                <div class="pro-card-body">
+                    <p class="subtitle" th:text="${e.titulo}">Título</p>
+                    <h3 th:text="${e.nombre}">Nombre</h3>
+                </div>
+            </button>
+        </div>
+    </div>
+</main>
+
+<div id="modal-especialista" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-especialista-titulo">
+    <div class="modal">
+        <button type="button" class="modal-close" data-modal-close aria-label="Cerrar">&times;</button>
+        <h2 id="modal-especialista-titulo" data-field="nombre">Especialista</h2>
+        <div class="modal-grid">
+            <div>
+                <p class="text-muted" data-field="titulo"></p>
+                <p><strong>Formación Académica:</strong></p>
+                <ul class="modal-list" data-field="formacion"></ul>
+                <p style="margin-top:1rem;"><strong>Áreas de especialidad clínica</strong></p>
+                <div data-field="especialidades"></div>
+            </div>
+            <div>
+                <img data-field="foto" src="" alt="" style="width:100%;border-radius:0.75rem;aspect-ratio:1;object-fit:cover;background:var(--muted);">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+<script th:src="@{/js/clinic.js}" defer></script>
+<script>
+    function abrirEspecialista(btn) {
+        var modal = document.getElementById('modal-especialista');
+        modal.querySelector('[data-field="nombre"]').textContent = btn.dataset.nombre;
+        modal.querySelector('[data-field="titulo"]').textContent = btn.dataset.titulo;
+        modal.querySelector('[data-field="foto"]').src = btn.dataset.foto;
+        modal.querySelector('[data-field="foto"]').alt = btn.dataset.nombre;
+        var formacion = modal.querySelector('[data-field="formacion"]');
+        formacion.innerHTML = '';
+        (btn.dataset.formacion || '').split('||').filter(Boolean).forEach(function (f) {
+            var li = document.createElement('li');
+            li.textContent = f;
+            formacion.appendChild(li);
+        });
+        var coleg = document.createElement('li');
+        coleg.textContent = btn.dataset.colegiatura;
+        formacion.appendChild(coleg);
+        var tags = modal.querySelector('[data-field="especialidades"]');
+        tags.innerHTML = '';
+        (btn.dataset.especialidades || '').split('||').filter(Boolean).forEach(function (esp) {
+            var span = document.createElement('span');
+            span.className = 'tag';
+            span.textContent = esp;
+            tags.appendChild(span);
+        });
+        modal.classList.add('open');
+    }
+</script>
+</body>
+</html>
