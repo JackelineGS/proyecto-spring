@@ -1,22 +1,15 @@
-# TODO - H2 (configuración) paso a paso
+# TODO - Persistir reservas en BD
 
-## Paso 1 (hecho/para confirmar)
-- Revisar `pom.xml` y decidir dependencias para usar H2 con Spring JDBC (sin implementar tablas todavía).
-
-## Paso 2
-- Agregar dependencias al `pom.xml`:
-  - `com.h2database:h2`
-  - `spring-boot-starter-jdbc`
-
-## Paso 3
-- Configurar `application.properties` para:
-  - URL H2 en memoria
-  - driver
-  - `spring.sql.init.mode=never` (para NO crear tablas aún)
-
-## Paso 4
-- Crear carpetas/archivos de configuración si hiciera falta (sin `schema.sql` aún).
-
-## Paso 5
-- Lanzar app para validar que levanta con H2 sin tablas (solo conexión).
+- [ ] Revisar campos faltantes en `Cita` para enlazar `Comprobante` (faltan `getComprobante/setComprobante`).
+- [ ] Actualizar `src/main/java/com/springboot/proyectospring/model/Cita.java` para agregar getter/setter de `comprobante`.
+- [x] Actualizar `src/main/java/com/springboot/proyectospring/service/CitaService.java`:
+  - [x] Inyectar `CitaRepository` y `PacienteRepository`.
+  - [x] Marcar `confirmarReserva` con `@Transactional`.
+  - [x] Crear `Paciente` y persistir con `pacienteRepository.save`.
+  - [x] Crear `Cita` con `paciente`, `paquete`, `especialistaId`, `fecha`, `hora`, `numeroSesion` y `creadoEn`.
+  - [x] Crear `Pago` y asociarlo a `cita`.
+  - [x] Crear `Comprobante`, enlazarlo con `cita`, y asignarlo en `cita`.
+  - [x] Persistir con `citaRepository.save(cita)` (para que cascade guarde `Pago` y `Comprobante`).
+- [ ] Asegurar que el `Map confirmacion` siga mostrando datos correctos (idealmente IDs de entidades creadas).
+- [ ] Ejecutar build/arranque y validar que al llamar `/reservar/exito` se crea al menos 1 registro en `cita`/`pago`/`comprobante`.
 

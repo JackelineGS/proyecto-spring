@@ -60,6 +60,7 @@ public class Cita {
     @OneToOne(mappedBy = "cita", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Comprobante comprobante;
 
+
     public Long getId() {
         return id;
     }
@@ -142,6 +143,13 @@ public class Cita {
         return pagos.stream().mapToDouble(p -> p.getMonto() == null ? 0.0 : p.getMonto()).sum();
     }
 
+    public Comprobante getComprobante() {
+        return comprobante;
+    }
+
+    public void setComprobante(Comprobante comprobante) {
+        this.comprobante = comprobante;
+    }
 
     @Override
     public boolean equals(Object o) {
