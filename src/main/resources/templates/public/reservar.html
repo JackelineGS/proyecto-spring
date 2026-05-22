@@ -5,29 +5,29 @@
 <div th:replace="~{fragments/layout :: nav('servicios')}"></div>
 
 <main class="container" style="padding:3rem 0;">
-    <h1 style="margin-bottom:2rem;" th:text="${servicio.etiquetaPaquete} + ' – ' + ${servicio.nombre}">Reservar servicio</h1>
+    <h1 style="margin-bottom:2rem;" th:text="'Reservar: ' + ${paquete.nombre}">Reservar servicio</h1>
 
     <div class="reserva-layout">
         <aside>
             <div class="reserva-img">
-                <img th:src="${servicio.imagenUrl}" th:alt="${servicio.nombre}">
+                <img src="https://images.unsplash.com/photo-1573497019418-b400bb3ab074?w=800&q=80" alt="Reserva">
             </div>
         </aside>
 
         <div>
             <div class="resumen-card">
-                <p class="price" th:text="'S/ ' + ${#numbers.formatDecimal(servicio.precio, 1, 2)}">S/ 0.00</p>
-                <p>💼 Costo por sesión</p>
-                <p>🕐 <span th:text="${servicio.duracion}">Duración</span></p>
+                <p class="price" th:text="'S/ ' + ${#numbers.formatDecimal(paquete.precio, 1, 2)}">S/ 0.00</p>
+                <p>💼 <span th:text="'Incluye ' + ${paquete.cantidadVisitas} + ' visita(s)'">Visitas</span></p>
+                <p>🕐 <span th:text="${paquete.duracionPorVisita}">Duración</span></p>
                 <p>🌐 Al reservar por la página web, elija la fecha y hora de su sesión.</p>
                 <p>📱 Si desea una reprogramación, escríbanos por WhatsApp al +51 923 826 177.</p>
             </div>
 
             <form id="reserva-form" th:action="@{/reservar/confirmar}" method="post"
-                  th:attr="data-servicio-nombre=${servicio.nombre},
-                           data-servicio-precio=${servicio.precio},
-                           data-servicio-formato=${servicio.formato}">
-                <input type="hidden" name="servicioId" th:value="${servicio.id}">
+                  th:attr="data-paquete-nombre=${paquete.nombre},
+                           data-paquete-precio=${paquete.precio},
+                           data-paquete-formato='Online'">
+                <input type="hidden" name="paqueteId" th:value="${paquete.id}">
                 <input type="hidden" name="especialistaId" value="">
                 <input type="hidden" name="fecha" value="">
                 <input type="hidden" name="hora" value="">

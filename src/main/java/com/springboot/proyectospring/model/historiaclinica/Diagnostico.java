@@ -3,6 +3,11 @@ package com.springboot.proyectospring.model.historiaclinica;
 import java.time.LocalDate;
 import java.util.Objects;
 
+import com.springboot.proyectospring.model.HistoriaClinica;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -17,7 +22,17 @@ public class Diagnostico {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long historiaClinicaId;
+        @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "historia_clinica_id")
+    private HistoriaClinica historiaClinica;
+
+    public HistoriaClinica getHistoriaClinica() {
+            return historiaClinica;
+        }
+
+        public void setHistoriaClinica(HistoriaClinica historiaClinica) {
+            this.historiaClinica = historiaClinica;
+        }
 
     private String codigo; // ej F41.1
     private String nombre; // ej Ansiedad
@@ -37,13 +52,7 @@ public class Diagnostico {
         this.id = id;
     }
 
-    public Long getHistoriaClinicaId() {
-        return historiaClinicaId;
-    }
 
-    public void setHistoriaClinicaId(Long historiaClinicaId) {
-        this.historiaClinicaId = historiaClinicaId;
-    }
 
     public String getCodigo() {
         return codigo;

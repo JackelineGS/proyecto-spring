@@ -34,10 +34,6 @@ public class Pago {
 
     private Double monto;
 
-    // Comprobante (boleta/factura) - representación legal
-    private String tipoComprobante;
-    private String numeroComprobante;
-
     public Long getId() {
         return id;
     }
@@ -80,22 +76,6 @@ public class Pago {
         this.monto = monto;
     }
 
-    public String getTipoComprobante() {
-        return tipoComprobante;
-    }
-
-    public void setTipoComprobante(String tipoComprobante) {
-        this.tipoComprobante = tipoComprobante;
-    }
-
-    public String getNumeroComprobante() {
-        return numeroComprobante;
-    }
-
-    public void setNumeroComprobante(String numeroComprobante) {
-        this.numeroComprobante = numeroComprobante;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -108,4 +88,3 @@ public class Pago {
         return Objects.hash(id);
     }
 }
-

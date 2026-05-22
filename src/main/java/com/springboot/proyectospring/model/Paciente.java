@@ -16,9 +16,9 @@ public class Paciente {
 
     private String nombre;
     private String apellido;
+    private String dni;
     private String celular;
     private String correo;
-    private String dni;
 
     public Long getId() {
         return id;
@@ -44,6 +44,14 @@ public class Paciente {
         this.apellido = apellido;
     }
 
+    public String getDni() {
+        return dni;
+    }
+
+    public void setDni(String dni) {
+        this.dni = dni;
+    }
+
     public String getCelular() {
         return celular;
     }
@@ -59,17 +67,4 @@ public class Paciente {
     public void setCorreo(String correo) {
         this.correo = correo;
     }
-
-    public String getDni() {
-        return dni;
-    }
-
-    public void setDni(String dni) {
-        this.dni = dni;
-    }
-
-    public String getNombreCompleto() {
-        return (nombre + " " + apellido).trim();
-    }
 }
-

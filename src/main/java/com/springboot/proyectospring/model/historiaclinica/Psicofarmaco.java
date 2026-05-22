@@ -8,7 +8,10 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-
+import com.springboot.proyectospring.model.HistoriaClinica;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 @Entity
 @Table(name = "psicofarmaco")
 public class Psicofarmaco {
@@ -17,7 +20,17 @@ public class Psicofarmaco {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long historiaClinicaId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "historia_clinica_id")
+    private HistoriaClinica historiaClinica;
+
+    public HistoriaClinica getHistoriaClinica() {
+        return historiaClinica;
+    }
+
+    public void setHistoriaClinica(HistoriaClinica historiaClinica) {
+        this.historiaClinica = historiaClinica;
+    }
 
     private String nombre;
     private String dosis;
@@ -36,13 +49,7 @@ public class Psicofarmaco {
         this.id = id;
     }
 
-    public Long getHistoriaClinicaId() {
-        return historiaClinicaId;
-    }
 
-    public void setHistoriaClinicaId(Long historiaClinicaId) {
-        this.historiaClinicaId = historiaClinicaId;
-    }
 
     public String getNombre() {
         return nombre;

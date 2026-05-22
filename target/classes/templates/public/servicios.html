@@ -13,75 +13,33 @@
         </div>
     </section>
 
-    <section class="section">
-        <div class="container">
-            <h2 class="section-center" style="margin-bottom: 3rem;">Nuestros servicios</h2>
-            <div class="grid-4">
-                <article class="card" th:each="servicio : ${serviciosGenerales}">
-                    <div class="card-media">
-                        <img th:src="${servicio.imagenUrl}" th:alt="${servicio.nombre}">
-                    </div>
-                    <div class="card-body">
-                        <h3 th:text="${servicio.nombre}">Servicio</h3>
-                        <p th:text="${servicio.descripcion}">Descripción</p>
-                    </div>
-                </article>
-            </div>
-        </div>
-    </section>
-
     <section class="section section-muted">
         <div class="container">
-            <h2 class="section-center" style="margin-bottom: 2.5rem;">Servicios únicos y paquetes</h2>
+            <h2 class="section-center" style="margin-bottom: 2.5rem;">Nuestro Catálogo de Paquetes</h2>
             <div class="tabs">
-                <button type="button" class="tab-btn active" data-tab="1">1 Sesión</button>
-                <button type="button" class="tab-btn" data-tab="4">Paquete 4 sesiones</button>
-                <button type="button" class="tab-btn" data-tab="10">Paquete 10 sesiones</button>
+                <!-- Genera las pestañas dinámicamente -->
+                <button type="button" class="tab-btn" th:each="tipo, stat : ${tiposPaquete}" 
+                        th:classappend="${stat.first} ? 'active' : ''" 
+                        th:attr="data-tab=${tipo.id}" 
+                        th:text="${tipo.nombre}">Categoría</button>
             </div>
 
-            <div class="tab-panel active" data-panel="1">
+            <!-- Paneles dinámicos por cada tipo de paquete -->
+            <div class="tab-panel" th:each="tipo, stat : ${tiposPaquete}" 
+                 th:classappend="${stat.first} ? 'active' : ''" 
+                 th:attr="data-panel=${tipo.id}">
                 <div class="grid-4">
-                    <article class="card" th:each="s : ${serviciosUnaSesion}">
+                    <!-- Iterar sobre los paquetes que pertenecen a este tipo -->
+                    <article class="card" th:each="p : ${tipo.paquetes}">
                         <div class="card-media card-media--wide">
-                            <img th:src="${s.imagenUrl}" th:alt="${s.nombre}">
+                            <img src="https://images.unsplash.com/photo-1573497019418-b400bb3ab074?w=800&q=80" alt="Terapia">
                         </div>
                         <div class="card-body" style="display:flex;flex-direction:column;gap:0.75rem;flex:1;">
-                            <h3 th:text="${s.nombre}">Servicio</h3>
-                            <p class="price" th:text="'S/. ' + ${s.precio}">S/. 0</p>
-                            <p class="text-muted" th:text="${s.detalle}">Detalle</p>
-                            <a th:href="@{/reservar/{id}(id=${s.id})}" class="btn btn-primary btn-block" style="margin-top:auto;">Reservar Hoy</a>
-                        </div>
-                    </article>
-                </div>
-            </div>
-
-            <div class="tab-panel" data-panel="4">
-                <div class="grid-4">
-                    <article class="card" th:each="s : ${serviciosCuatro}">
-                        <div class="card-media card-media--wide">
-                            <img th:src="${s.imagenUrl}" th:alt="${s.nombre}">
-                        </div>
-                        <div class="card-body" style="display:flex;flex-direction:column;gap:0.75rem;flex:1;">
-                            <h3 th:text="${s.nombre}">Servicio</h3>
-                            <p class="price" th:text="'S/. ' + ${s.precio}">S/. 0</p>
-                            <p class="text-muted" th:text="${s.detalle}">Detalle</p>
-                            <a th:href="@{/reservar/{id}(id=${s.id})}" class="btn btn-primary btn-block" style="margin-top:auto;">Reservar Hoy</a>
-                        </div>
-                    </article>
-                </div>
-            </div>
-
-            <div class="tab-panel" data-panel="10">
-                <div class="grid-4">
-                    <article class="card" th:each="s : ${serviciosDiez}">
-                        <div class="card-media card-media--wide">
-                            <img th:src="${s.imagenUrl}" th:alt="${s.nombre}">
-                        </div>
-                        <div class="card-body" style="display:flex;flex-direction:column;gap:0.75rem;flex:1;">
-                            <h3 th:text="${s.nombre}">Servicio</h3>
-                            <p class="price" th:text="'S/. ' + ${s.precio}">S/. 0</p>
-                            <p class="text-muted" th:text="${s.detalle}">Detalle</p>
-                            <a th:href="@{/reservar/{id}(id=${s.id})}" class="btn btn-primary btn-block" style="margin-top:auto;">Reservar Hoy</a>
+                            <h3 th:text="${p.nombre}">Paquete</h3>
+                            <p class="price" th:text="'S/. ' + ${#numbers.formatDecimal(p.precio, 1, 2)}">S/. 0</p>
+                            <p class="text-muted" th:text="'Visitas incluidas: ' + ${p.cantidadVisitas}">Visitas</p>
+                            <p class="text-muted" th:text="'Duración: ' + ${p.duracionPorVisita}">Duración</p>
+                            <a th:href="@{/reservar/{id}(id=${p.id})}" class="btn btn-primary btn-block" style="margin-top:auto;">Reservar Hoy</a>
                         </div>
                     </article>
                 </div>

@@ -6,10 +6,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -21,9 +28,14 @@ public class Cita {
     private Long id;
 
 
-    // Relaciones (sin JPA): la cita es el puente entre paciente y servicio.
-    private Long pacienteId;
-    private Long servicioId;
+    // Relaciones: la cita es el puente entre paciente y el paquete comprado.
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "paciente_id")
+    private Paciente paciente;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "paquete_id")
+    private Paquete paquete;
 
     // Cuando el servicio es un paquete, genera varias visitas (sesión 1..N).
     // Esto permite modelar "Sesión 1 de 3" incluso sin una tabla Visita persistida aún.
@@ -38,11 +50,15 @@ public class Cita {
     private LocalDateTime creadoEn;
 
     // En la práctica puede haber múltiples pagos por cita.
-    // (JPA: la relación se maneja desde Pago.cita)
+    // Relación bidireccional mapeada por el atributo "cita" en la clase Pago
+    @JsonIgnore
+    @OneToMany(mappedBy = "cita", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Pago> pagos = new ArrayList<>();
 
-
-
+    // Relación 1 a 1 bidireccional, el dueño de la FK es el Comprobante
+    @JsonIgnore
+    @OneToOne(mappedBy = "cita", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Comprobante comprobante;
 
     public Long getId() {
         return id;
@@ -52,20 +68,20 @@ public class Cita {
         this.id = id;
     }
 
-    public Long getPacienteId() {
-        return pacienteId;
+    public Paciente getPaciente() {
+        return paciente;
     }
 
-    public void setPacienteId(Long pacienteId) {
-        this.pacienteId = pacienteId;
+    public void setPaciente(Paciente paciente) {
+        this.paciente = paciente;
     }
 
-    public Long getServicioId() {
-        return servicioId;
+    public Paquete getPaquete() {
+        return paquete;
     }
 
-    public void setServicioId(Long servicioId) {
-        this.servicioId = servicioId;
+    public void setPaquete(Paquete paquete) {
+        this.paquete = paquete;
     }
 
     public int getNumeroSesion() {
@@ -139,4 +155,3 @@ public class Cita {
         return Objects.hash(id);
     }
 }
-

@@ -90,13 +90,13 @@
     }
 
     function formatoModalidad() {
-        var f = (reservaForm.dataset.servicioFormato || 'online').toLowerCase();
+        var f = (reservaForm.dataset.paqueteFormato || 'online').toLowerCase();
         return f === 'online' ? 'virtual' : f;
     }
 
     function actualizarTextosReserva() {
-        var nombre = reservaForm.dataset.servicioNombre || 'servicio';
-        var precio = parseFloat(reservaForm.dataset.servicioPrecio || '0');
+        var nombre = reservaForm.dataset.paqueteNombre || 'paquete';
+        var precio = parseFloat(reservaForm.dataset.paquetePrecio || '0');
         var hora = reservaForm.querySelector('[name="hora"]').value;
         var fecha = reservaForm.querySelector('[name="fecha"]').value;
         var esp = reservaForm.dataset.especialistaNombre || '';

@@ -2,7 +2,7 @@ package com.springboot.proyectospring.dto;
 
 public class ReservaRequest {
 
-    private Long servicioId;
+    private Long paqueteId;
     private Long especialistaId;
     private String modalidad;
     private String fecha;
@@ -15,12 +15,12 @@ public class ReservaRequest {
     private String metodoPago;
     private String tipoComprobante;
 
-    public Long getServicioId() {
-        return servicioId;
+    public Long getPaqueteId() {
+        return paqueteId;
     }
 
-    public void setServicioId(Long servicioId) {
-        this.servicioId = servicioId;
+    public void setPaqueteId(Long paqueteId) {
+        this.paqueteId = paqueteId;
     }
 
     public Long getEspecialistaId() {

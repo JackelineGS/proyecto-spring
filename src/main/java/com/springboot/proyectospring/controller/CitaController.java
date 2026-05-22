@@ -1,10 +1,10 @@
 package com.springboot.proyectospring.controller;
 
 import com.springboot.proyectospring.dto.ReservaRequest;
-import com.springboot.proyectospring.model.Servicio;
+import com.springboot.proyectospring.model.Paquete;
 import com.springboot.proyectospring.service.CitaService;
 import com.springboot.proyectospring.service.EspecialistaService;
-import com.springboot.proyectospring.service.ServicioService;
+import com.springboot.proyectospring.service.PaqueteService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,23 +18,23 @@ import java.util.Map;
 @Controller
 public class CitaController {
 
-    private final ServicioService servicioService;
+    private final PaqueteService paqueteService;
     private final EspecialistaService especialistaService;
     private final CitaService citaService;
 
-    public CitaController(ServicioService servicioService,
+    public CitaController(PaqueteService paqueteService,
                           EspecialistaService especialistaService,
                           CitaService citaService) {
-        this.servicioService = servicioService;
+        this.paqueteService = paqueteService;
         this.especialistaService = especialistaService;
         this.citaService = citaService;
     }
 
     @GetMapping("/reservar/{id}")
     public String reservar(@PathVariable Long id, Model model) {
-        Servicio servicio = servicioService.buscarPorId(id)
-                .orElseThrow(() -> new IllegalArgumentException("Servicio no encontrado"));
-        model.addAttribute("servicio", servicio);
+        Paquete paquete = paqueteService.buscarPorId(id)
+                .orElseThrow(() -> new IllegalArgumentException("Paquete no encontrado"));
+        model.addAttribute("paquete", paquete);
         model.addAttribute("especialistas", especialistaService.listarTodos());
         return "public/reservar";
     }

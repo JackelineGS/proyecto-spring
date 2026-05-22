@@ -9,10 +9,15 @@ import com.springboot.proyectospring.model.historiaclinica.Diagnostico;
 import com.springboot.proyectospring.model.historiaclinica.Evaluaciones;
 import com.springboot.proyectospring.model.historiaclinica.Psicofarmaco;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -24,15 +29,24 @@ public class HistoriaClinica {
     private Long id;
 
 
-    // Relación 1 a 1 (en términos del modelo): la historia pertenece a un paciente.
-    private Long pacienteId;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "paciente_id")
+    private Paciente paciente;
 
     private String motivoConsulta;
     private String observaciones;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "anamnesis_id")
     private Anamnesis anamnesis;
+
+    @OneToMany(mappedBy = "historiaClinica", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Diagnostico> diagnosticos = new ArrayList<>();
+
+    @OneToMany(mappedBy = "historiaClinica", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Psicofarmaco> psicofarmacos = new ArrayList<>();
+
+    @OneToMany(mappedBy = "historiaClinica", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Evaluaciones> evaluaciones = new ArrayList<>();
 
     public Long getId() {
@@ -43,12 +57,12 @@ public class HistoriaClinica {
         this.id = id;
     }
 
-    public Long getPacienteId() {
-        return pacienteId;
+    public Paciente getPaciente() {
+        return paciente;
     }
 
-    public void setPacienteId(Long pacienteId) {
-        this.pacienteId = pacienteId;
+    public void setPaciente(Paciente paciente) {
+        this.paciente = paciente;
     }
 
     public String getMotivoConsulta() {
@@ -129,4 +143,3 @@ public class HistoriaClinica {
         return Objects.hash(id);
     }
 }
-

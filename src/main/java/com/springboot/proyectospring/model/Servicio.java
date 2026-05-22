@@ -1,11 +1,12 @@
 package com.springboot.proyectospring.model;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 
@@ -18,35 +19,14 @@ public class Servicio {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String nombre;
-    private String descripcion;
-    @Enumerated(EnumType.STRING)
-    private TipoServicio tipo;
+    private int numeroVisita;
+    private String accionMedica;
 
-    @Enumerated(EnumType.STRING)
-    private PaqueteSesion paquete;
-
-    private Double precio;
-    private String duracion;
-    private String formato;
-    private String detalle;
-    private String imagenUrl;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "paquete_id")
+    private Paquete paquete;
 
     public Servicio() {
-    }
-
-    public Servicio(Long id, String nombre, String descripcion, TipoServicio tipo, PaqueteSesion paquete,
-                    Double precio, String duracion, String formato, String detalle, String imagenUrl) {
-        this.id = id;
-        this.nombre = nombre;
-        this.descripcion = descripcion;
-        this.tipo = tipo;
-        this.paquete = paquete;
-        this.precio = precio;
-        this.duracion = duracion;
-        this.formato = formato;
-        this.detalle = detalle;
-        this.imagenUrl = imagenUrl;
     }
 
     public Long getId() {
@@ -57,86 +37,27 @@ public class Servicio {
         this.id = id;
     }
 
-    public String getNombre() {
-        return nombre;
+    public int getNumeroVisita() {
+        return numeroVisita;
     }
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
+    public void setNumeroVisita(int numeroVisita) {
+        this.numeroVisita = numeroVisita;
     }
 
-    public String getDescripcion() {
-        return descripcion;
+    public String getAccionMedica() {
+        return accionMedica;
     }
 
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
+    public void setAccionMedica(String accionMedica) {
+        this.accionMedica = accionMedica;
     }
 
-    public TipoServicio getTipo() {
-        return tipo;
-    }
-
-    public void setTipo(TipoServicio tipo) {
-        this.tipo = tipo;
-    }
-
-    public PaqueteSesion getPaquete() {
+    public Paquete getPaquete() {
         return paquete;
     }
 
-    public void setPaquete(PaqueteSesion paquete) {
+    public void setPaquete(Paquete paquete) {
         this.paquete = paquete;
-    }
-
-    public Double getPrecio() {
-        return precio;
-    }
-
-    public void setPrecio(Double precio) {
-        this.precio = precio;
-    }
-
-    public String getDuracion() {
-        return duracion;
-    }
-
-    public void setDuracion(String duracion) {
-        this.duracion = duracion;
-    }
-
-    public String getFormato() {
-        return formato;
-    }
-
-    public void setFormato(String formato) {
-        this.formato = formato;
-    }
-
-    public String getDetalle() {
-        return detalle;
-    }
-
-    public void setDetalle(String detalle) {
-        this.detalle = detalle;
-    }
-
-    public String getImagenUrl() {
-        return imagenUrl;
-    }
-
-    public void setImagenUrl(String imagenUrl) {
-        this.imagenUrl = imagenUrl;
-    }
-
-    public String getEtiquetaPaquete() {
-        if (paquete == null) {
-            return "";
-        }
-        return switch (paquete) {
-            case UNA -> "1 Sesión";
-            case CUATRO -> "Paquete de 4 sesiones";
-            case DIEZ -> "Paquete de 10 sesiones";
-        };
     }
 }
