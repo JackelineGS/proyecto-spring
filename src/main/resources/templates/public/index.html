@@ -1,10 +1,68 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:replace="~{fragments/layout :: head('Inicio')}"></head>
 <body>
+<div th:replace="~{fragments/layout :: nav('home')}"></div>
 
+<main>
+    <section class="hero">
+        <img src="https://images.unsplash.com/photo-1531171596281-8b5d26917d8b?w=1600&q=80" alt="Terapia psicológica">
+        <div class="hero-overlay"></div>
+        <div class="hero-content container">
+            <div class="hero-text">
+                <h1>La terapia puede equilibrar tu vida</h1>
+                <p>Acompañamiento psicológico profesional, online y desde donde estés.</p>
+                <a th:href="@{/servicios}" class="btn btn-primary">Agendar Cita</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container section-center">
+            <h2>Quiénes somos</h2>
+            <p>
+                Digital Health nació con el objetivo de reducir las barreras para el tratamiento psicológico,
+                llevando a la terapia psicológica de una modalidad usualmente presencial a una modalidad online.
+                Actualmente Digital Health brinda servicios de salud mental basado en evidencia para personas de
+                habla hispana en el Perú y en el extranjero, mediante terapia online y soluciones digitales innovadoras.
+                Por otro lado, busca convertirse en una plataforma líder en salud mental digital en Latinoamérica,
+                transformando la forma en que las personas acceden a apoyo psicológico mediante tecnología escalable,
+                accesible y centrada en el usuario.
+            </p>
+        </div>
+    </section>
+
+    <section class="section" style="padding-top: 0;">
+        <div class="container">
+            <h2 class="section-center" style="margin-bottom: 3rem;">¿Cómo funciona?</h2>
+            <div class="grid-3">
+                <article class="card step-card">
+                    <div class="step-icon" aria-hidden="true">📋</div>
+                    <p class="step-label">Paso 1</p>
+                    <h3>Elige un Plan</h3>
+                    <p class="text-muted">Elige acompañamiento individual, adolescente, de pareja o para padres.</p>
+                </article>
+                <article class="card step-card">
+                    <div class="step-icon" aria-hidden="true">📅</div>
+                    <p class="step-label">Paso 2</p>
+                    <h3>Agenda tu horario</h3>
+                    <p class="text-muted">Selecciona el día y la hora que mejor funcione para ti o escríbenos por WhatsApp.</p>
+                </article>
+                <article class="card step-card">
+                    <div class="step-icon" aria-hidden="true">💻</div>
+                    <p class="step-label">Paso 3</p>
+                    <h3>Conéctate online</h3>
+                    <p class="text-muted">Recibe acompañamiento online, en español y desde donde estés, de forma simple y segura.</p>
+                </article>
+            </div>
+            <p class="section-center" style="margin-top: 3rem;">
+                <a th:href="@{/servicios}" class="btn btn-outline">Ver Servicios</a>
+            </p>
+        </div>
+    </section>
+</main>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
 </body>
 </html>

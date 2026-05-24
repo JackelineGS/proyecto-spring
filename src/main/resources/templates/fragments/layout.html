@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title} + ' | Digital Health'">Digital Health</title>
+    <link rel="stylesheet" th:href="@{/css/clinic.css}">
+</head>
+
+<body>
+
+<header th:fragment="nav(active)" class="site-header">
+    <div class="container">
+        <a th:href="@{/}" class="logo">
+            <span class="logo-icon" aria-hidden="true">♥</span>
+            <span>Digital Health</span>
+        </a>
+        <nav class="site-nav" aria-label="Principal">
+            <a th:href="@{/servicios}"
+               class="nav-link"
+               th:classappend="${active == 'servicios'} ? ' active' : ''">Servicios</a>
+            <a th:href="@{/profesionales}"
+               class="nav-link"
+               th:classappend="${active == 'profesionales'} ? ' active' : ''">Profesionales</a>
+            <a th:href="@{/login}"
+               class="nav-link"
+               th:classappend="${active == 'login'} ? ' active' : ''">Acceso staff</a>
+        </nav>
+    </div>
+</header>
+
+<footer th:fragment="footer" class="site-footer">
+    <div class="container footer-grid">
+        <div>
+            <h3>Contactos</h3>
+            <p>Si tienes alguna consulta o sugerencia no dudes en escribir.</p>
+            <a href="https://wa.me/51923826177" class="btn btn-outline" target="_blank" rel="noopener">WhatsApp</a>
+        </div>
+        <div class="footer-right">
+            <p>Síguenos en redes</p>
+            <div class="social-links">
+                <a href="#" class="social-link" aria-label="Facebook">f</a>
+                <a href="#" class="social-link" aria-label="Instagram">ig</a>
+                <a href="#" class="social-link" aria-label="LinkedIn">in</a>
+                <a href="#" class="social-link" aria-label="YouTube">yt</a>
+            </div>
+        </div>
+    </div>
+    <div class="container footer-copy">
+        © 2026 Digital Health | Centro Médico.
+    </div>
+</footer>
+
+<script th:fragment="scripts" th:src="@{/js/clinic.js}" defer></script>
+
+</body>
+</html>

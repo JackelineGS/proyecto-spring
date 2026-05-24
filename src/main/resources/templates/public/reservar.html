@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:replace="~{fragments/layout :: head('Reservar')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: nav('servicios')}"></div>
+
+<main class="container" style="padding:3rem 0;">
+    <h1 style="margin-bottom:2rem;" th:text="${paquete.totalSesiones} + (${paquete.totalSesiones == 1} ? ' sesión – ' : ' sesiones – ') + ${paquete.nombre}">Reservar paquete</h1>
+
+    <div class="reserva-layout">
+        <aside>
+            <div class="reserva-img">
+                <img src="https://images.unsplash.com/photo-1573497019418-b400bb3ab074?w=800&q=80" th:alt="${paquete.nombre}">
+            </div>
+        </aside>
+
+        <div>
+            <div class="resumen-card">
+                <p class="price" th:text="'S/ ' + ${#numbers.formatDecimal(paquete.precioTotal, 1, 2)}">S/ 0.00</p>
+                <p>💼 Precio total del paquete</p>
+                <p>🕐 <span th:text="${paquete.totalSesiones} + ' sesión(es)'">Sesiones</span></p>
+                <p th:if="${paquete.descripcion}" class="text-muted" th:text="${paquete.descripcion}">Descripción</p>
+                <p>🌐 Al reservar por la página web, elija la fecha y hora de su sesión.</p>
+                <p>📱 Si desea una reprogramación, escríbanos por WhatsApp al +51 923 826 177.</p>
+            </div>
+
+            <form id="reserva-form" th:action="@{/reservar/confirmar}" method="post"
+                  th:attr="data-paquete-nombre=${paquete.nombre},
+                           data-paquete-precio=${paquete.precioTotal}">
+                <input type="hidden" name="paqueteId" th:value="${paquete.id}">
+                <input type="hidden" name="empleadoId" value="">
+                <input type="hidden" name="fecha" value="">
+                <input type="hidden" name="hora" value="">
+                <input type="hidden" name="metodoPago" value="tarjeta">
+                <input type="hidden" name="tipoComprobante" value="boleta">
+
+                <div class="stepper" role="tablist">
+                    <button type="button" class="stepper-btn active" data-step="0">1. Especialista</button>
+                    <button type="button" class="stepper-btn" data-step="1">2. Horario</button>
+                    <button type="button" class="stepper-btn" data-step="2">3. Detalles</button>
+                    <button type="button" class="stepper-btn" data-step="3">4. Pago</button>
+                </div>
+
+                <div class="card" style="padding:1.5rem;border:1px solid var(--border);border-radius:1rem;">
+
+                    <!-- Paso 1 -->
+                    <section class="step-panel active" data-step-panel="0">
+                        <div class="form-group">
+                            <label>Elegir Especialista</label>
+                            <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;">
+                                <button type="button" class="btn btn-outline" data-modal-open="modal-elegir-especialista">Ver</button>
+                                <span id="empleado-seleccionado" class="text-muted">Ningún especialista seleccionado</span>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Paso 2 -->
+                    <section class="step-panel" data-step-panel="1">
+                        <p class="text-muted">A continuación puede encontrar la lista de intervalos de horas disponibles.</p>
+                        <div class="calendario-wrap">
+                            <div id="calendario" class="calendario">
+                                <div class="cal-header">
+                                    <button type="button" data-cal-prev aria-label="Mes anterior">‹</button>
+                                    <strong data-cal-title></strong>
+                                    <button type="button" data-cal-next aria-label="Mes siguiente">›</button>
+                                </div>
+                                <div class="cal-grid">
+                                    <span class="day-name">Do</span><span class="day-name">Lu</span><span class="day-name">Ma</span>
+                                    <span class="day-name">Mi</span><span class="day-name">Ju</span><span class="day-name">Vi</span><span class="day-name">Sa</span>
+                                </div>
+                                <div class="cal-grid cal-grid-days"></div>
+                            </div>
+                            <div>
+                                <p id="fecha-seleccionada" class="text-muted" style="margin-bottom:0.75rem;">Selecciona un día</p>
+                                <div id="horarios-grid" class="horarios-grid">
+                                    <p class="text-muted">Selecciona un especialista en el paso anterior.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Paso 3 -->
+                    <section class="step-panel" data-step-panel="2">
+                        <p id="texto-confirmacion-datos" class="text-muted" style="margin-bottom:1rem;">
+                            Ingresa tus datos para confirmar la cita.
+                        </p>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="nombreCompleto">Nombre y apellido</label>
+                                <input id="nombreCompleto" name="nombreCompleto" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="celular">Celular</label>
+                                <input id="celular" name="celular" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="correo">Correo</label>
+                                <input id="correo" name="correo" type="email" class="form-control" required
+                                       autocomplete="email">
+                            </div>
+                            <div class="form-group">
+                                <label for="dni">DNI</label>
+                                <input id="dni" name="dni" class="form-control" maxlength="8" inputmode="numeric"
+                                       pattern="[0-9]{8}" title="8 dígitos" required>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Paso 4 -->
+                    <section class="step-panel" data-step-panel="3">
+                        <div class="resumen-pago" id="resumen-pago">
+                            <p id="resumen-linea1">—</p>
+                            <p id="resumen-linea2" class="text-muted">Con —</p>
+                            <p id="resumen-linea3" class="text-muted">—</p>
+                            <p id="resumen-total" class="price">Total: S/0.00</p>
+                        </div>
+                        <div class="form-group">
+                            <label>Tipo de comprobante</label>
+                            <div class="pago-metodos comprobante-opciones">
+                                <button type="button" class="pago-metodo comprobante-opcion selected" data-comprobante="boleta">Boleta</button>
+                                <button type="button" class="pago-metodo comprobante-opcion" data-comprobante="factura">Factura</button>
+                            </div>
+                        </div>
+                        <p id="boleta-dni-info" class="text-muted comprobante-campo active" style="margin-bottom:1rem;"></p>
+                        <div id="campo-ruc-comprobante" class="form-group comprobante-campo">
+                            <label for="ruc">Número de RUC</label>
+                            <input id="ruc" name="ruc" class="form-control" maxlength="11" inputmode="numeric">
+                        </div>
+                        <div class="form-group">
+                            <label>Método de pago</label>
+                            <div class="pago-metodos">
+                                <button type="button" class="pago-metodo selected" data-metodo="tarjeta">Tarjeta</button>
+                                <button type="button" class="pago-metodo" data-metodo="yape">Yape / Plin</button>
+                                <button type="button" class="pago-metodo" data-metodo="transferencia">Transferencia</button>
+                            </div>
+                        </div>
+                        <div class="pago-panel active" data-pago="tarjeta">
+                            <div class="form-row">
+                                <div class="form-group" style="grid-column:1/-1;">
+                                    <label>Número de tarjeta</label>
+                                    <input class="form-control" placeholder="0000 0000 0000 0000" autocomplete="off">
+                                </div>
+                                <div class="form-group" style="grid-column:1/-1;">
+                                    <label>Titular</label>
+                                    <input class="form-control" autocomplete="off">
+                                </div>
+                                <div class="form-group">
+                                    <label>Vencimiento</label>
+                                    <input class="form-control" placeholder="MM/AA" autocomplete="off">
+                                </div>
+                                <div class="form-group">
+                                    <label>CVV</label>
+                                    <input class="form-control" placeholder="123" autocomplete="off">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pago-panel" data-pago="yape">
+                            <p class="text-muted">Escanea el QR enviado al correo o envía el monto al +51 923 826 177 (simulación de pago).</p>
+                        </div>
+                        <div class="pago-panel" data-pago="transferencia">
+                            <p class="text-muted">Realiza la transferencia a la cuenta BCP 194-12345678-0-90 y confirma con tu voucher (simulación).</p>
+                        </div>
+                    </section>
+
+                    <div class="step-actions">
+                        <button type="button" class="btn btn-outline" data-step-prev disabled>Anterior</button>
+                        <button type="button" class="btn btn-primary" data-step-next>Siguiente</button>
+                        <button type="submit" class="btn btn-primary" data-step-submit style="display:none;">Confirmar pago</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+
+<!-- Modal elegir especialista -->
+<div id="modal-elegir-especialista" class="modal-overlay" role="dialog" aria-modal="true">
+    <div class="modal" style="max-width:40rem;">
+        <button type="button" class="modal-close" data-modal-close aria-label="Cerrar">&times;</button>
+        <h2>Elige a tu especialista</h2>
+        <div style="max-height:60vh;overflow-y:auto;padding-right:0.5rem;">
+            <article class="especialista-row" th:each="e : ${empleados}">
+                <div>
+                    <h3 th:text="${e.nombreCompleto}">Nombre</h3>
+                    <p class="text-muted" th:if="${e.especialidadNombre}"
+                       th:text="'Especialidad: ' + ${e.especialidadNombre}">Especialidad</p>
+                    <p class="text-muted" th:if="${e.celular}" th:text="'Cel: ' + ${e.celular}">Celular</p>
+                </div>
+                <div class="col-right">
+                    <img src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=600&q=80" th:alt="${e.nombreCompleto}">
+                    <button type="button" class="btn btn-sm btn-outline"
+                            data-select-empleado
+                            th:attr="data-id=${e.id}, data-nombre=${e.nombreCompleto}">Agregar</button>
+                </div>
+            </article>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

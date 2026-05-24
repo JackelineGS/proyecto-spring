@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- HEADER FRAGMENT -->
+<header th:fragment="header" class="border-b border-border bg-background/80 backdrop-blur-sm">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+        <a th:href="@{/}" class="flex items-center gap-2">
+            <div class="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+                <i data-lucide="heart" class="w-5 h-5"></i>
+            </div>
+            <span class="tracking-tight">Digital Health &middot; Especialistas</span>
+        </a>
+        <a th:href="@{/login}" class="flex items-center gap-2 text-muted-foreground hover:text-foreground transition">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+            Cerrar sesión
+        </a>
+    </div>
+</header>
+
+<!-- SIDEBAR FRAGMENT -->
+<aside th:fragment="sidebar(activeMenu)" class="space-y-1">
+    <a th:href="@{/especialista/citas}"
+       th:classappend="${activeMenu == 'citas' ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}"
+       class="flex items-center gap-3 rounded-xl px-4 py-3 transition">
+        <i data-lucide="calendar-days" class="w-4 h-4"></i>
+        Citas
+    </a>
+    <a th:href="@{/especialista/historias}"
+       th:classappend="${activeMenu == 'historias' ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}"
+       class="flex items-center gap-3 rounded-xl px-4 py-3 transition">
+        <i data-lucide="folder-heart" class="w-4 h-4"></i>
+        Historias clínicas
+    </a>
+    <a th:href="@{/especialista/horarios}"
+       th:classappend="${activeMenu == 'horarios' ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}"
+       class="flex items-center gap-3 rounded-xl px-4 py-3 transition">
+        <i data-lucide="clock" class="w-4 h-4"></i>
+        Horarios
+    </a>
+</aside>
+
+</body>
+</html>

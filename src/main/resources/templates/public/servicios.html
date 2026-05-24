@@ -1,10 +1,100 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:replace="~{fragments/layout :: head('Servicios')}"></head>
 <body>
+<div th:replace="~{fragments/layout :: nav('servicios')}"></div>
 
+<main>
+    <section class="page-header">
+        <div class="container">
+            <h1>Consultorio de Salud Mental</h1>
+            <p>Consultas Online y Presencial</p>
+            <a href="https://wa.me/51923826177" class="btn btn-outline" target="_blank" rel="noopener">Solicitar información</a>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <h2 class="section-center" style="margin-bottom: 3rem;">Nuestros servicios</h2>
+            <div class="grid-4">
+                <article class="card" th:each="servicio : ${serviciosCatalogo}">
+                    <div class="card-media">
+                        <img src="https://images.unsplash.com/photo-1573497019418-b400bb3ab074?w=800&q=80" th:alt="${servicio.nombre}">
+                    </div>
+                    <div class="card-body">
+                        <h3 th:text="${servicio.nombre}">Servicio</h3>
+                        <p class="text-muted" th:if="${servicio.duracion != null}"
+                           th:text="${servicio.duracion} + ' min por sesión'">Duración</p>
+                        <p class="price" th:if="${servicio.precioUn != null}"
+                           th:text="'Desde S/. ' + ${#numbers.formatDecimal(servicio.precioUn, 1, 2)}">Precio</p>
+                    </div>
+                </article>
+            </div>
+            <p th:if="${#lists.isEmpty(serviciosCatalogo)}" class="section-center text-muted">Catálogo en actualización.</p>
+        </div>
+    </section>
+
+    <section class="section section-muted">
+        <div class="container">
+            <h2 class="section-center" style="margin-bottom: 2.5rem;">Paquetes para reservar</h2>
+            <div class="tabs">
+                <button type="button" class="tab-btn active" data-tab="1">1 Sesión</button>
+                <button type="button" class="tab-btn" data-tab="4">Paquete 4 sesiones</button>
+                <button type="button" class="tab-btn" data-tab="10">Paquete 10 sesiones</button>
+            </div>
+
+            <div class="tab-panel active" data-panel="1">
+                <div class="grid-4">
+                    <article class="card" th:each="p : ${paquetesUnaSesion}">
+                        <div class="card-media card-media--wide">
+                            <img src="https://images.unsplash.com/photo-1573497019418-b400bb3ab074?w=800&q=80" th:alt="${p.nombre}">
+                        </div>
+                        <div class="card-body" style="display:flex;flex-direction:column;gap:0.75rem;flex:1;">
+                            <h3 th:text="${p.nombre}">Paquete</h3>
+                            <p class="price" th:text="'S/. ' + ${#numbers.formatDecimal(p.precioTotal, 1, 2)}">S/. 0</p>
+                            <p class="text-muted" th:text="${p.descripcion}">Descripción</p>
+                            <a th:href="@{/reservar/{id}(id=${p.id})}" class="btn btn-primary btn-block" style="margin-top:auto;">Reservar Hoy</a>
+                        </div>
+                    </article>
+                </div>
+            </div>
+
+            <div class="tab-panel" data-panel="4">
+                <div class="grid-4">
+                    <article class="card" th:each="p : ${paquetesCuatro}">
+                        <div class="card-media card-media--wide">
+                            <img src="https://images.unsplash.com/photo-1591343395082-e120087004b4?w=800&q=80" th:alt="${p.nombre}">
+                        </div>
+                        <div class="card-body" style="display:flex;flex-direction:column;gap:0.75rem;flex:1;">
+                            <h3 th:text="${p.nombre}">Paquete</h3>
+                            <p class="price" th:text="'S/. ' + ${#numbers.formatDecimal(p.precioTotal, 1, 2)}">S/. 0</p>
+                            <p class="text-muted" th:text="${p.descripcion}">Descripción</p>
+                            <a th:href="@{/reservar/{id}(id=${p.id})}" class="btn btn-primary btn-block" style="margin-top:auto;">Reservar Hoy</a>
+                        </div>
+                    </article>
+                </div>
+            </div>
+
+            <div class="tab-panel" data-panel="10">
+                <div class="grid-4">
+                    <article class="card" th:each="p : ${paquetesDiez}">
+                        <div class="card-media card-media--wide">
+                            <img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=800&q=80" th:alt="${p.nombre}">
+                        </div>
+                        <div class="card-body" style="display:flex;flex-direction:column;gap:0.75rem;flex:1;">
+                            <h3 th:text="${p.nombre}">Paquete</h3>
+                            <p class="price" th:text="'S/. ' + ${#numbers.formatDecimal(p.precioTotal, 1, 2)}">S/. 0</p>
+                            <p class="text-muted" th:text="${p.descripcion}">Descripción</p>
+                            <a th:href="@{/reservar/{id}(id=${p.id})}" class="btn btn-primary btn-block" style="margin-top:auto;">Reservar Hoy</a>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
 </body>
 </html>

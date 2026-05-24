@@ -1,10 +1,188 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Servicios - Administración')}"></head>
+<body class="bg-background text-foreground min-h-screen flex flex-col">
 
+    <div th:replace="~{fragments/admin-layout :: header}"></div>
+
+    <div class="flex-1 max-w-[1400px] w-full mx-auto px-6 py-8 grid grid-cols-[220px_1fr] gap-8">
+        <div th:replace="~{fragments/admin-layout :: sidebar('servicios')}"></div>
+
+        <section class="min-w-0">
+            <div class="space-y-6">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                        <h1 class="tracking-tight text-2xl font-medium">Servicios</h1>
+                        <p class="text-muted-foreground">Catálogo de servicios de la clínica (tabla Servicio).</p>
+                    </div>
+                    <button type="button" onclick="abrirModalServicio()"
+                            class="inline-flex items-center justify-center rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 gap-2">
+                        <i data-lucide="plus" class="w-4 h-4"></i> Agregar servicio
+                    </button>
+                </div>
+
+                <div th:if="${mensaje}"
+                     class="rounded-md border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-700"
+                     th:text="${mensaje}"></div>
+                <div th:if="${error}"
+                     class="rounded-md border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-600"
+                     th:text="${error}"></div>
+
+                <div class="relative max-w-md">
+                    <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"></i>
+                    <input id="buscar-servicio" type="search" placeholder="Buscar servicio"
+                           oninput="filtrarServicios(this.value)"
+                           class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm pl-9">
+                </div>
+
+                <div class="rounded-2xl border border-border overflow-hidden">
+                    <table class="w-full">
+                        <thead class="bg-muted/50 text-muted-foreground">
+                            <tr class="text-left">
+                                <th class="py-3 px-4 text-sm font-medium">Nombre</th>
+                                <th class="py-3 px-4 text-sm font-medium">Precio (S/)</th>
+                                <th class="py-3 px-4 text-sm font-medium">Duración</th>
+                                <th class="py-3 px-4 w-28"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-servicios">
+                            <tr th:each="servicio, stat : ${servicios}"
+                                class="fila-servicio border-t border-border"
+                                th:classappend="${stat.odd} ? ' bg-muted/20' : ''"
+                                th:attr="data-nombre=${servicio.nombre},
+                                         data-precio=${servicio.precioUn},
+                                         data-duracion=${servicio.duracion}">
+                                <td class="py-3 px-4 text-sm nombre-cell" th:text="${servicio.nombre}">Nombre</td>
+                                <td class="py-3 px-4 text-sm"
+                                    th:text="${servicio.precioUn != null} ? 'S/ ' + ${#numbers.formatDecimal(servicio.precioUn, 1, 2)} : '—'">Precio</td>
+                                <td class="py-3 px-4 text-sm text-muted-foreground"
+                                    th:text="${servicio.duracion != null} ? ${servicio.duracion} + ' min' : '—'">Duración</td>
+                                <td class="py-3 px-4">
+                                    <button type="button"
+                                            class="btn-editar inline-flex items-center justify-center rounded-md border border-input bg-background hover:bg-accent h-9 px-3 gap-1.5 text-sm"
+                                            th:attr="data-id=${servicio.id},
+                                                     data-nombre=${servicio.nombre},
+                                                     data-precio=${servicio.precioUn},
+                                                     data-duracion=${servicio.duracion}">
+                                        <i data-lucide="pencil" class="w-3.5 h-3.5"></i> Editar
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(servicios)}" id="fila-vacia">
+                                <td colspan="4" class="py-12 text-center text-sm text-muted-foreground">
+                                    No hay servicios registrados.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Modal crear / editar -->
+    <div id="modal-servicio" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+        <div class="bg-card border border-border rounded-2xl shadow-xl w-full max-w-md p-6">
+            <div class="flex items-center justify-between mb-5">
+                <h2 id="modal-servicio-titulo" class="text-lg font-medium tracking-tight">Nuevo servicio</h2>
+                <button type="button" onclick="cerrarModalServicio()" class="text-muted-foreground hover:text-foreground p-1 rounded-md hover:bg-accent">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <form th:action="@{/admin/servicios/guardar}" method="post" class="space-y-4">
+                <input type="hidden" name="id" id="servicio-id" value="">
+
+                <div class="space-y-2">
+                    <label for="servicio-nombre" class="text-sm font-medium">Nombre <span class="text-red-500">*</span></label>
+                    <input id="servicio-nombre" name="nombre" type="text" required maxlength="100"
+                           class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                </div>
+
+                <div class="space-y-2">
+                    <label for="servicio-precio" class="text-sm font-medium">Precio unitario (S/)</label>
+                    <input id="servicio-precio" name="precioUn" type="number" min="0" step="0.01"
+                           class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                           placeholder="Ej. 150.00">
+                </div>
+
+                <div class="space-y-2">
+                    <label for="servicio-duracion" class="text-sm font-medium">Duración (minutos)</label>
+                    <input id="servicio-duracion" name="duracion" type="number" min="1" step="1"
+                           class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                           placeholder="Ej. 50">
+                </div>
+
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="cerrarModalServicio()"
+                            class="inline-flex items-center justify-center rounded-md border border-input bg-background hover:bg-accent h-10 px-4 text-sm font-medium">
+                        Cancelar
+                    </button>
+                    <button type="submit"
+                            class="inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 text-sm font-medium">
+                        Guardar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        var modal = document.getElementById('modal-servicio');
+        var titulo = document.getElementById('modal-servicio-titulo');
+        var inputId = document.getElementById('servicio-id');
+        var inputNombre = document.getElementById('servicio-nombre');
+        var inputPrecio = document.getElementById('servicio-precio');
+        var inputDuracion = document.getElementById('servicio-duracion');
+
+        function abrirModalServicio() {
+            titulo.textContent = 'Nuevo servicio';
+            inputId.value = '';
+            inputNombre.value = '';
+            inputPrecio.value = '';
+            inputDuracion.value = '';
+            mostrarModal();
+        }
+
+        function abrirModalEditar(btn) {
+            titulo.textContent = 'Editar servicio';
+            inputId.value = btn.dataset.id || '';
+            inputNombre.value = btn.dataset.nombre || '';
+            inputPrecio.value = btn.dataset.precio !== undefined && btn.dataset.precio !== '' ? btn.dataset.precio : '';
+            inputDuracion.value = btn.dataset.duracion !== undefined && btn.dataset.duracion !== '' ? btn.dataset.duracion : '';
+            mostrarModal();
+        }
+
+        function mostrarModal() {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            lucide.createIcons();
+        }
+
+        function cerrarModalServicio() {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        document.querySelectorAll('.btn-editar').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                abrirModalEditar(btn);
+            });
+        });
+
+        modal.addEventListener('click', function (e) {
+            if (e.target === modal) cerrarModalServicio();
+        });
+
+        function filtrarServicios(texto) {
+            var q = (texto || '').trim().toLowerCase();
+            document.querySelectorAll('.fila-servicio').forEach(function (fila) {
+                var nombre = (fila.dataset.nombre || '').toLowerCase();
+                fila.style.display = !q || nombre.includes(q) ? '' : 'none';
+            });
+        }
+    </script>
 </body>
 </html>
