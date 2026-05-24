@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Historias Clínicas - Especialista')}"></head>
+<body class="bg-background text-foreground min-h-screen flex flex-col">
+
+<div th:replace="~{fragments/especialista-layout :: header}"></div>
+
+<div class="flex-1 max-w-7xl w-full mx-auto px-6 py-8 grid grid-cols-[220px_1fr] gap-8">
+    <div th:replace="~{fragments/especialista-layout :: sidebar('historias')}"></div>
+
+    <section class="min-w-0">
+        <div class="space-y-6 max-w-3xl">
+            <h1 class="tracking-tight text-2xl font-medium">Buscar historia clínica</h1>
+
+            <div class="rounded-2xl border border-border bg-card p-6 space-y-5">
+                <form th:action="@{/especialista/historias}" method="get" class="space-y-5">
+
+                    <div class="space-y-2">
+                        <label for="tipo" class="text-sm font-medium leading-none">Buscar por</label>
+                        <select id="tipo" name="tipo"
+                                onchange="actualizarPlaceholder(this.value)"
+                                class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring">
+                            <option value="dni" th:selected="${tipo == 'dni'}">DNI del paciente</option>
+                            <option value="codigo" th:selected="${tipo == 'codigo'}">Código de historia clínica</option>
+                        </select>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label for="valor" class="text-sm font-medium leading-none flex items-center gap-2" id="label-valor">
+                            Número de DNI
+                        </label>
+                        <input id="valor" name="valor" type="text"
+                               th:value="${valor}"
+                               placeholder="Ej. 72839102"
+                               class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                        <p id="ayuda-valor" class="text-muted-foreground text-sm">Ingresa los 8 dígitos del DNI del paciente.</p>
+
+                        <p th:if="${error}" class="text-red-500 text-sm" th:text="${error}"></p>
+                    </div>
+
+                    <button type="submit"
+                            class="inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 transition-colors">
+                        <i data-lucide="search" class="w-4 h-4"></i>
+                        Buscar
+                    </button>
+                </form>
+            </div>
+
+            <div th:if="${busquedaRealizada and resultado == null}"
+                 class="rounded-2xl border border-dashed border-border bg-muted/30 p-8 text-center text-muted-foreground">
+                No se encontró ninguna historia clínica que coincida.
+            </div>
+
+            <div th:if="${resultado != null}"
+                 class="rounded-2xl border border-border bg-card p-6 space-y-4">
+                <div class="flex items-start justify-between gap-4">
+                    <div>
+                        <p class="text-muted-foreground flex items-center gap-1.5 text-sm">
+                            <i data-lucide="hash" class="w-3.5 h-3.5"></i>
+                            <span th:text="${resultado.numHc}">HC-XXXX-XXXXX</span>
+                        </p>
+                        <h3 class="tracking-tight mt-1 text-lg font-medium" th:text="${resultado.paciente}">Nombre</h3>
+                        <p class="text-muted-foreground text-sm" th:text="'DNI ' + ${resultado.numDocumento}">Documento</p>
+                    </div>
+                    <button onclick="abrirDetalle()"
+                            class="inline-flex items-center gap-2 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3 text-sm font-medium transition-colors">
+                        <i data-lucide="file-text" class="w-4 h-4"></i>
+                        Ver detalle
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </section>
+</div>
+
+<div id="modal-historia" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/50 backdrop-blur-sm">
+    <div class="bg-card border border-border rounded-2xl shadow-xl w-[98vw] max-w-[950px] mx-4 p-0 overflow-y-auto max-h-[95vh]">
+
+        <div class="p-6 sm:p-8 space-y-6">
+            <div class="flex items-center justify-between">
+                <h2 class="text-xl font-semibold tracking-tight text-foreground">Historia clínica detallada</h2>
+                <button onclick="cerrarDetalle()" class="text-muted-foreground hover:text-foreground transition p-1 rounded-md hover:bg-accent">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div th:if="${resultado != null}" class="space-y-6">
+                <div class="rounded-2xl border border-border bg-muted/30 p-6 space-y-4">
+                    <div class="flex flex-wrap items-start justify-between gap-3">
+                        <h3 class="text-lg font-medium tracking-tight text-foreground" th:text="${resultado.paciente}">Nombre del Paciente</h3>
+                        <div class="flex items-center gap-2">
+                            <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold bg-background text-foreground border-border" th:text="'DNI ' + ${resultado.numDocumento}">DNI XXXXXXXX</span>
+                            <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold bg-background text-foreground border-border" th:text="${resultado.numHc}">HC-0000-00000</span>
+                            <button type="button" onclick="abrirModalPaciente()" class="inline-flex items-center justify-center rounded-md border border-input bg-background hover:bg-accent h-7 w-7 text-muted-foreground hover:text-foreground transition-colors ml-2" title="Editar datos del paciente">
+                                <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="h-[1px] bg-border w-full"></div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                        <div>
+                            <p class="text-muted-foreground text-xs">Fecha de nacimiento</p>
+                            <p class="font-medium text-foreground" th:text="${resultado.fechaNacimiento} + ' (' + ${resultado.edad} + ' a.)'">—</p>
+                        </div>
+                        <div>
+                            <p class="text-muted-foreground text-xs">Sexo</p>
+                            <p class="font-medium text-foreground" th:text="${resultado.sexo}">—</p>
+                        </div>
+                        <div>
+                            <p class="text-muted-foreground text-xs">Grado de instrucción</p>
+                            <p class="font-medium text-foreground" th:text="${resultado.gradoInstruccion}">—</p>
+                        </div>
+                        <div>
+                            <p class="text-muted-foreground text-xs">Ocupación</p>
+                            <p class="font-medium text-foreground" th:text="${resultado.ocupacion}">—</p>
+                        </div>
+                        <div>
+                            <p class="text-muted-foreground text-xs">Última cita</p>
+                            <p class="font-medium text-foreground" th:text="${resultado.ultimaCita}">—</p>
+                        </div>
+                        <div>
+                            <p class="text-muted-foreground text-xs">N° hijos</p>
+                            <p class="font-medium text-foreground" th:text="${resultado.numeroHijos}">—</p>
+                        </div>
+                        <div class="col-span-2">
+                            <p class="text-muted-foreground text-xs">Lugar de residencia</p>
+                            <p class="font-medium text-foreground" th:text="${resultado.residencia}">—</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="w-full">
+                    <div class="grid w-full grid-cols-2 sm:grid-cols-5 gap-1 p-1 bg-muted rounded-xl text-sm font-medium text-muted-foreground">
+                        <button onclick="cambiarPestaña('anamnesis')" id="tab-btn-anamnesis" class="tab-btn py-1.5 px-3 rounded-lg text-center transition-all bg-background text-foreground shadow-sm">Anamnesis</button>
+                        <button onclick="cambiarPestaña('diagnostico')" id="tab-btn-diagnostico" class="tab-btn py-1.5 px-3 rounded-lg text-center transition-all hover:text-foreground">Diagnóstico</button>
+                        <button onclick="cambiarPestaña('visitas')" id="tab-btn-visitas" class="tab-btn py-1.5 px-3 rounded-lg text-center transition-all hover:text-foreground">Visitas</button>
+                        <button onclick="cambiarPestaña('psicofarmacos')" id="tab-btn-psicofarmacos" class="tab-btn py-1.5 px-3 rounded-lg text-center transition-all hover:text-foreground">Psicofármacos</button>
+                        <button onclick="cambiarPestaña('evaluacion')" id="tab-btn-evaluacion" class="tab-btn py-1.5 px-3 rounded-lg text-center transition-all hover:text-foreground">Evaluación</button>
+                    </div>
+
+                    <div id="tab-content-anamnesis" class="tab-content mt-6 space-y-6">
+                        <div class="flex justify-end">
+                            <button type="button" onclick="abrirModalAnamnesis()" class="inline-flex items-center gap-2 rounded-md border border-input bg-background hover:bg-accent h-9 px-3 text-sm font-medium transition-colors">
+                                <i data-lucide="pencil" class="w-4 h-4"></i> Editar anamnesis
+                            </button>
+                        </div>
+                        <div class="rounded-2xl border border-border p-5 space-y-2">
+                            <label class="text-sm font-medium leading-none text-foreground">Motivo de consulta</label>
+                            <textarea class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-70" rows="3" disabled
+                                      th:text="${resultado.motivoConsulta} ?: 'Sin registro'">—</textarea>
+                        </div>
+                        <div class="rounded-2xl border border-border p-5 space-y-4">
+                            <h3 class="text-base font-medium tracking-tight text-foreground">Historia personal y social</h3>
+                            <div class="space-y-2">
+                                <label class="text-xs font-medium text-muted-foreground">Niñez</label>
+                                <textarea class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm disabled:opacity-70" rows="2" disabled
+                                          th:text="${resultado.histNinez} ?: 'Sin registro'">—</textarea>
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-xs font-medium text-muted-foreground">Adolescencia</label>
+                                <textarea class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm disabled:opacity-70" rows="2" disabled
+                                          th:text="${resultado.histAdolescencia} ?: 'Sin registro'">—</textarea>
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-xs font-medium text-muted-foreground">Adultez</label>
+                                <textarea class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm disabled:opacity-70" rows="2" disabled
+                                          th:text="${resultado.histAdultez} ?: 'Sin registro'">—</textarea>
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-xs font-medium text-muted-foreground">Uso de sustancias</label>
+                                <textarea class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm disabled:opacity-70" rows="2" disabled
+                                          th:text="${resultado.usoSustancias} ?: 'Sin registro'">—</textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="tab-content-diagnostico" class="tab-content mt-6 hidden">
+                        <div class="rounded-2xl border border-border p-5 space-y-4">
+                            <div class="flex items-center justify-between gap-3">
+                                <p class="text-muted-foreground font-medium text-xs uppercase tracking-wider">Diagnósticos activos (CIE-10 / DSM-5)</p>
+                                <button type="button" onclick="abrirModalDiagnostico()" class="inline-flex items-center gap-1.5 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 h-8 px-3 text-xs font-medium transition-colors">
+                                    <i data-lucide="plus" class="w-3.5 h-3.5"></i> Agregar
+                                </button>
+                            </div>
+                            <div class="divide-y divide-border text-sm">
+                                <div th:each="d : ${resultado.diagnosticos}" class="flex items-center gap-4 py-3">
+                                    <span class="font-mono text-xs border border-border px-1.5 py-0.5 rounded bg-muted" th:text="${d.codCie} ?: '—'">CIE</span>
+                                    <span class="flex-1 text-foreground" th:text="${d.descripcion}">Descripción</span>
+                                </div>
+                                <p th:if="${#lists.isEmpty(resultado.diagnosticos)}" class="py-4 text-muted-foreground text-sm">Sin diagnósticos registrados.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="tab-content-visitas" class="tab-content mt-6 hidden">
+                        <div class="rounded-2xl border border-border p-5 space-y-4">
+                            <div class="flex items-center justify-between gap-3">
+                                <p class="text-muted-foreground font-medium text-xs uppercase tracking-wider">Historial de visitas</p>
+                                <button type="button" onclick="abrirModalVisita()" class="inline-flex items-center gap-1.5 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 h-8 px-3 text-xs font-medium transition-colors">
+                                    <i data-lucide="plus" class="w-3.5 h-3.5"></i> Agregar
+                                </button>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-sm border-collapse">
+                                    <thead class="text-muted-foreground font-medium border-b border-border text-xs">
+                                    <tr>
+                                        <th class="py-2 pr-4">Fecha</th>
+                                        <th class="py-2 pr-4">Hora</th>
+                                        <th class="py-2 pr-4">Sesión</th>
+                                        <th class="py-2 pr-4">Descripción</th>
+                                        <th class="py-2 pr-4">Estado</th>
+                                        <th class="py-2 w-24"></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody class="text-foreground">
+                                    <tr th:each="v : ${resultado.visitas}" class="border-b border-border last:border-0">
+                                        <td class="py-3 pr-4 whitespace-nowrap" th:text="${v.fecha}">—</td>
+                                        <td class="py-3 pr-4" th:text="${v.hora}">—</td>
+                                        <td class="py-3 pr-4 font-medium" th:text="${v.tratamiento} ?: '—'">—</td>
+                                        <td class="py-3 pr-4 text-muted-foreground max-w-xs truncate" th:text="${v.descripcion}">—</td>
+                                        <td class="py-3 pr-4">—</td>
+                                        <td class="py-3 pr-4"></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="tab-content-psicofarmacos" class="tab-content mt-6 hidden">
+                        <div class="rounded-2xl border border-border p-5 space-y-4">
+                            <div class="flex items-center justify-between gap-3">
+                                <p class="text-muted-foreground font-medium text-xs uppercase tracking-wider">Medicación y Tratamiento</p>
+                                <button type="button" onclick="abrirModalPsicofarmaco()" class="inline-flex items-center gap-1.5 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 h-8 px-3 text-xs font-medium transition-colors">
+                                    <i data-lucide="plus" class="w-3.5 h-3.5"></i> Agregar
+                                </button>
+                            </div>
+                            <div class="divide-y divide-border text-sm">
+                                <div th:each="p : ${resultado.psicofarmacos}" class="flex items-center gap-4 py-3">
+                                    <div class="flex-1 space-y-0.5">
+                                        <p class="font-medium text-foreground" th:text="${p.nombre}">Medicamento</p>
+                                        <p class="text-xs text-muted-foreground">
+                                            Dosis: <span th:text="${p.dosis} ?: '—'">—</span>
+                                            · Frecuencia: <span th:text="${p.frecuencia} ?: '—'">—</span>
+                                            · Desde: <span th:text="${p.fechaInicio} ?: '—'">—</span>
+                                            · Hasta: <span th:text="${p.fechaFin} ?: 'Actualidad'">—</span>
+                                        </p>
+                                    </div>
+                                </div>
+                                <p th:if="${#lists.isEmpty(resultado.psicofarmacos)}" class="py-4 text-muted-foreground text-sm">Sin psicofármacos registrados.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="tab-content-evaluacion" class="tab-content mt-6 hidden">
+                        <div class="rounded-2xl border border-border p-5 space-y-4">
+                            <div class="flex items-center justify-between gap-3">
+                                <p class="text-muted-foreground font-medium text-xs uppercase tracking-wider">Evaluaciones psicométricas aplicadas</p>
+                                <button type="button" onclick="abrirModalEvaluacion()" class="inline-flex items-center gap-1.5 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 h-8 px-3 text-xs font-medium transition-colors">
+                                    <i data-lucide="plus" class="w-3.5 h-3.5"></i> Agregar
+                                </button>
+                            </div>
+                            <div class="grid sm:grid-cols-2 gap-4 text-sm">
+                                <div th:each="e : ${resultado.evaluaciones}" class="rounded-xl border border-border bg-muted/30 p-4 space-y-2">
+                                    <p class="font-medium text-foreground" th:text="${e.NombreEvaluacion}">Evaluación</p>
+                                    <p class="text-xs text-muted-foreground">Nivel: <span th:text="${e.nivel} ?: '—'">—</span></p>
+                                    <p class="text-xs font-semibold text-foreground tracking-tight"
+                                       th:text="'Puntaje: ' + ${e.puntaje} + '/' + ${e.puntajeMax}">Puntaje</p>
+                                </div>
+                                <p th:if="${#lists.isEmpty(resultado.evaluaciones)}" class="text-muted-foreground text-sm col-span-2">Sin evaluaciones registradas.</p>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modales Secundarios -->
+<div th:if="${resultado != null}">
+    <!-- Modal Editar Paciente -->
+    <div id="modal-editar-paciente" class="fixed inset-0 z-[60] hidden flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+        <div class="bg-card border border-border rounded-xl shadow-xl w-full max-w-md overflow-hidden flex flex-col max-h-full">
+            <div class="p-5 border-b border-border flex items-center justify-between bg-muted/30">
+                <h3 class="font-medium tracking-tight">Editar Datos del Paciente</h3>
+                <button type="button" onclick="cerrarModal('modal-editar-paciente')" class="text-muted-foreground hover:text-foreground">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <form th:action="@{/especialista/historias/paciente/guardar}" method="post" class="overflow-y-auto p-5 space-y-4">
+                <input type="hidden" name="codigo" th:value="${resultado.numHc}">
+                <div class="space-y-2">
+                    <label class="text-sm font-medium">Ocupación</label>
+                    <input type="text" name="ocupacion" th:value="${resultado.ocupacion}" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-sm font-medium">Grado de instrucción</label>
+                    <input type="text" name="gradoInstruccion" th:value="${resultado.gradoInstruccion}" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-sm font-medium">Número de hijos</label>
+                    <input type="number" name="numeroHijos" th:value="${resultado.numeroHijos}" min="0" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-sm font-medium">Lugar de residencia</label>
+                    <input type="text" name="residencia" th:value="${resultado.residencia}" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                </div>
+                <button type="submit" class="w-full inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 text-sm font-medium transition-colors">
+                    Guardar cambios
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Editar Anamnesis -->
+    <div id="modal-anamnesis" class="fixed inset-0 z-[60] hidden flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+        <div class="bg-card border border-border rounded-xl shadow-xl w-full max-w-2xl overflow-hidden flex flex-col max-h-full">
+            <div class="p-5 border-b border-border flex items-center justify-between bg-muted/30">
+                <h3 class="font-medium tracking-tight">Editar Anamnesis</h3>
+                <button type="button" onclick="cerrarModal('modal-anamnesis')" class="text-muted-foreground hover:text-foreground">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <form th:action="@{/especialista/historias/anamnesis/guardar}" method="post" class="overflow-y-auto p-5 space-y-4">
+                <input type="hidden" name="codigo" th:value="${resultado.numHc}">
+                <div class="space-y-2">
+                    <label class="text-sm font-medium">Motivo de consulta</label>
+                    <textarea name="motivoConsulta" class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" rows="2" th:text="${resultado.motivoConsulta}"></textarea>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-sm font-medium">Niñez</label>
+                    <textarea name="histNinez" class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" rows="2" th:text="${resultado.histNinez}"></textarea>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-sm font-medium">Adolescencia</label>
+                    <textarea name="histAdolescencia" class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" rows="2" th:text="${resultado.histAdolescencia}"></textarea>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-sm font-medium">Adultez</label>
+                    <textarea name="histAdultez" class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" rows="2" th:text="${resultado.histAdultez}"></textarea>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-sm font-medium">Uso de sustancias</label>
+                    <textarea name="usoSustancias" class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" rows="2" th:text="${resultado.usoSustancias}"></textarea>
+                </div>
+                <button type="submit" class="w-full inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 text-sm font-medium transition-colors">
+                    Guardar anamnesis
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Diagnóstico -->
+    <div id="modal-diagnostico" class="fixed inset-0 z-[60] hidden flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+        <div class="bg-card border border-border rounded-xl shadow-xl w-full max-w-md overflow-hidden flex flex-col max-h-full">
+            <div class="p-5 border-b border-border flex items-center justify-between bg-muted/30">
+                <h3 class="font-medium tracking-tight">Agregar Diagnóstico</h3>
+                <button type="button" onclick="cerrarModal('modal-diagnostico')" class="text-muted-foreground hover:text-foreground">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <form th:action="@{/especialista/historias/diagnostico/guardar}" method="post" class="overflow-y-auto p-5 space-y-4">
+                <input type="hidden" name="codigo" th:value="${resultado.numHc}">
+                <div class="space-y-2">
+                    <label class="text-sm font-medium">Código CIE-10 / DSM-5</label>
+                    <input type="text" name="codCie" placeholder="Ej. F41.1" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm font-mono focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" required>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-sm font-medium">Descripción</label>
+                    <textarea name="descripcion" placeholder="Trastorno de ansiedad..." class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" rows="2" required></textarea>
+                </div>
+                <button type="submit" class="w-full inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 text-sm font-medium transition-colors">
+                    Guardar
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Visita -->
+    <div id="modal-visita" class="fixed inset-0 z-[60] hidden flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+        <div class="bg-card border border-border rounded-xl shadow-xl w-full max-w-md overflow-hidden flex flex-col max-h-full">
+            <div class="p-5 border-b border-border flex items-center justify-between bg-muted/30">
+                <h3 class="font-medium tracking-tight">Agregar Visita</h3>
+                <button type="button" onclick="cerrarModal('modal-visita')" class="text-muted-foreground hover:text-foreground">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <form th:action="@{/especialista/historias/visita/guardar}" method="post" class="overflow-y-auto p-5 space-y-4">
+                <input type="hidden" name="codigo" th:value="${resultado.numHc}">
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium">Fecha</label>
+                        <input type="date" name="fecha" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" required>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium">Hora</label>
+                        <input type="time" name="hora" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" required>
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-sm font-medium">Sesión (Tratamiento)</label>
+                    <input type="text" name="tratamiento" placeholder="Ej. Sesión 2" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-sm font-medium">Descripción</label>
+                    <textarea name="descripcion" class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" rows="3" required></textarea>
+                </div>
+                <button type="submit" class="w-full inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 text-sm font-medium transition-colors">
+                    Guardar
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Psicofármaco -->
+    <div id="modal-psicofarmaco" class="fixed inset-0 z-[60] hidden flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+        <div class="bg-card border border-border rounded-xl shadow-xl w-full max-w-md overflow-hidden flex flex-col max-h-full">
+            <div class="p-5 border-b border-border flex items-center justify-between bg-muted/30">
+                <h3 class="font-medium tracking-tight">Agregar Psicofármaco</h3>
+                <button type="button" onclick="cerrarModal('modal-psicofarmaco')" class="text-muted-foreground hover:text-foreground">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <form th:action="@{/especialista/historias/psicofarmaco/guardar}" method="post" class="overflow-y-auto p-5 space-y-4">
+                <input type="hidden" name="codigo" th:value="${resultado.numHc}">
+                <div class="space-y-2">
+                    <label class="text-sm font-medium">Nombre y Presentación</label>
+                    <input type="text" name="nombre" placeholder="Ej. Sertralina 50 mg" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" required>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium">Dosis</label>
+                        <input type="text" name="dosis" placeholder="1 comprimido" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium">Frecuencia</label>
+                        <input type="text" name="frecuencia" placeholder="Cada 8 horas" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium">Desde</label>
+                        <input type="date" name="fechaInicio" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium">Hasta (vacío si actual)</label>
+                        <input type="date" name="fechaFin" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                    </div>
+                </div>
+                <button type="submit" class="w-full inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 text-sm font-medium transition-colors">
+                    Guardar
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Evaluación -->
+    <div id="modal-evaluacion" class="fixed inset-0 z-[60] hidden flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+        <div class="bg-card border border-border rounded-xl shadow-xl w-full max-w-md overflow-hidden flex flex-col max-h-full">
+            <div class="p-5 border-b border-border flex items-center justify-between bg-muted/30">
+                <h3 class="font-medium tracking-tight">Agregar Evaluación</h3>
+                <button type="button" onclick="cerrarModal('modal-evaluacion')" class="text-muted-foreground hover:text-foreground">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <form th:action="@{/especialista/historias/evaluacion/guardar}" method="post" class="overflow-y-auto p-5 space-y-4">
+                <input type="hidden" name="codigo" th:value="${resultado.numHc}">
+                <div class="space-y-2">
+                    <label class="text-sm font-medium">Nombre de la Evaluación</label>
+                    <input type="text" name="NombreEvaluacion" placeholder="Ej. GAD-7" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" required>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-sm font-medium">Nivel o Interpretación</label>
+                    <input type="text" name="nivel" placeholder="Ej. Severa (>15)" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium">Puntaje</label>
+                        <input type="number" step="0.01" name="puntaje" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" required>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium">Puntaje Máximo</label>
+                        <input type="number" step="0.01" name="puntajeMax" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                    </div>
+                </div>
+                <button type="submit" class="w-full inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 text-sm font-medium transition-colors">
+                    Guardar
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function abrirModalPaciente() { document.getElementById('modal-editar-paciente').classList.remove('hidden'); }
+    function abrirModalAnamnesis() { document.getElementById('modal-anamnesis').classList.remove('hidden'); }
+    function abrirModalDiagnostico() { document.getElementById('modal-diagnostico').classList.remove('hidden'); }
+    function abrirModalVisita() { document.getElementById('modal-visita').classList.remove('hidden'); }
+    function abrirModalPsicofarmaco() { document.getElementById('modal-psicofarmaco').classList.remove('hidden'); }
+    function abrirModalEvaluacion() { document.getElementById('modal-evaluacion').classList.remove('hidden'); }
+    function cerrarModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+    lucide.createIcons();
+
+    // Actualizar label y placeholder según el tipo seleccionado
+    function actualizarPlaceholder(tipo) {
+        const label = document.getElementById('label-valor');
+        const input = document.getElementById('valor');
+        const ayuda = document.getElementById('ayuda-valor');
+        if (tipo === 'dni') {
+            label.innerHTML = 'Número de DNI';
+            input.placeholder = 'Ej. 72839102';
+            ayuda.textContent = 'Ingresa los 8 dígitos del DNI del paciente.';
+        } else {
+            label.innerHTML = '<i data-lucide="hash" class="w-4 h-4 text-muted-foreground"></i> Código (HC-AAAA-00000)';
+            input.placeholder = 'Ej. HC-2026-00001';
+            ayuda.textContent = 'Formato: HC-AAAA-00000 (ej. HC-2026-00001).';
+            lucide.createIcons();
+        }
+    }
+
+    // Inicializar con el valor actual del select
+    actualizarPlaceholder(document.getElementById('tipo').value);
+
+    function abrirDetalle() {
+        document.getElementById('modal-historia').classList.remove('hidden');
+        // Resetear a la primera pestaña (anamnesis) cada vez que se abre
+        cambiarPestaña('anamnesis');
+    }
+
+    function cerrarDetalle() {
+        document.getElementById('modal-historia').classList.add('hidden');
+    }
+
+    document.getElementById('modal-historia').addEventListener('click', function(e) {
+        if (e.target === this) cerrarDetalle();
+    });
+
+    // Lógica interactiva para cambiar entre las Pestañas (Tabs) del Modal
+    function cambiarPestaña(pestañaId) {
+        // Ocultar todos los contenidos de las pestañas
+        const contenidos = document.querySelectorAll('.tab-content');
+        contenidos.forEach(content => content.classList.add('hidden'));
+
+        // Desactivar los estilos activos de todos los botones
+        const botones = document.querySelectorAll('.tab-btn');
+        botones.forEach(btn => {
+            btn.classList.remove('bg-background', 'text-foreground', 'shadow-sm');
+            btn.classList.add('hover:text-foreground');
+        });
+
+        // Mostrar el contenido de la pestaña seleccionada
+        const contenidoActivo = document.getElementById('tab-content-' + pestañaId);
+        if(contenidoActivo) contenidoActivo.classList.remove('hidden');
+
+        // Aplicar estilos de botón activo a la pestaña clickeada
+        const botonActivo = document.getElementById('tab-btn-' + pestañaId);
+        if(botonActivo) {
+            botonActivo.classList.add('bg-background', 'text-foreground', 'shadow-sm');
+            botonActivo.classList.remove('hover:text-foreground');
+        }
+    }
+</script>
+</body>
+</html>

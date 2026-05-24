@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Paquetes - Administración')}"></head>
+<body class="bg-background text-foreground min-h-screen flex flex-col">
+
+    <div th:replace="~{fragments/admin-layout :: header}"></div>
+
+    <div class="flex-1 max-w-[1400px] w-full mx-auto px-6 py-8 grid grid-cols-[220px_1fr] gap-8">
+        <div th:replace="~{fragments/admin-layout :: sidebar('paquetes')}"></div>
+
+        <section class="min-w-0">
+            <div class="space-y-6">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                        <h1 class="tracking-tight text-2xl font-medium">Paquetes</h1>
+                        <p class="text-muted-foreground">Ofertas comerciales con servicios incluidos (DetallePaquete).</p>
+                    </div>
+                    <button type="button" onclick="abrirModalPaquete()"
+                            class="inline-flex items-center justify-center rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 gap-2">
+                        <i data-lucide="plus" class="w-4 h-4"></i> Agregar paquete
+                    </button>
+                </div>
+
+                <div th:if="${mensaje}"
+                     class="rounded-md border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-700"
+                     th:text="${mensaje}"></div>
+                <div th:if="${error}"
+                     class="rounded-md border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-600"
+                     th:text="${error}"></div>
+
+                <div th:if="${#lists.isEmpty(serviciosCatalogo)}"
+                     class="rounded-md border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-800">
+                    Primero debes crear servicios en la sección <a th:href="@{/admin/servicios}" class="underline font-medium">Servicios</a>
+                    antes de armar un paquete.
+                </div>
+
+                <div class="relative max-w-md">
+                    <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"></i>
+                    <input id="buscar-paquete" type="search" placeholder="Buscar paquete"
+                           oninput="filtrarPaquetes(this.value)"
+                           class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm pl-9">
+                </div>
+
+                <div class="rounded-2xl border border-border overflow-hidden">
+                    <table class="w-full">
+                        <thead class="bg-muted/50 text-muted-foreground">
+                            <tr class="text-left">
+                                <th class="py-3 px-4 text-sm font-medium">Nombre</th>
+                                <th class="py-3 px-4 text-sm font-medium">Servicios incluidos</th>
+                                <th class="py-3 px-4 text-sm font-medium">Sesiones</th>
+                                <th class="py-3 px-4 text-sm font-medium">Precio total</th>
+                                <th class="py-3 px-4 w-28"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="paquete, stat : ${paquetes}"
+                                class="fila-paquete border-t border-border"
+                                th:classappend="${stat.odd} ? ' bg-muted/20' : ''"
+                                th:attr="data-nombre=${paquete.nombre}">
+                                <td class="py-3 px-4">
+                                    <div class="text-sm font-medium" th:text="${paquete.nombre}">Nombre</div>
+                                    <div class="text-sm text-muted-foreground" th:text="${paquete.descripcion}">Descripción</div>
+                                </td>
+                                <td class="py-3 px-4">
+                                    <div class="flex flex-wrap gap-1.5">
+                                        <span th:each="s : ${paquete.serviciosIncluidos}"
+                                              class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold border-border"
+                                              th:text="${s}">Servicio</span>
+                                        <span th:if="${#lists.isEmpty(paquete.serviciosIncluidos)}"
+                                              class="text-xs text-muted-foreground">Sin detalle</span>
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4 text-sm text-muted-foreground"
+                                    th:text="${paquete.totalSesiones} ?: '—'">Sesiones</td>
+                                <td class="py-3 px-4 text-sm"
+                                    th:text="${paquete.precioTotal != null} ? 'S/ ' + ${#numbers.formatDecimal(paquete.precioTotal, 1, 2)} : '—'">Precio</td>
+                                <td class="py-3 px-4">
+                                    <button type="button"
+                                            class="btn-editar-paquete inline-flex items-center justify-center rounded-md border border-input bg-background hover:bg-accent h-9 px-3 gap-1.5 text-sm"
+                                            th:attr="data-id=${paquete.id}">
+                                        <i data-lucide="pencil" class="w-3.5 h-3.5"></i> Editar
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(paquetes)}">
+                                <td colspan="5" class="py-12 text-center text-sm text-muted-foreground">
+                                    No hay paquetes registrados.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Modal crear / editar paquete -->
+    <div id="modal-paquete" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+        <div class="bg-card border border-border rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6">
+            <div class="flex items-center justify-between mb-5">
+                <h2 id="modal-paquete-titulo" class="text-lg font-medium tracking-tight">Nuevo paquete</h2>
+                <button type="button" onclick="cerrarModalPaquete()" class="text-muted-foreground hover:text-foreground p-1 rounded-md hover:bg-accent">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <form id="form-paquete" th:action="@{/admin/paquetes/guardar}" method="post" class="space-y-5">
+                <input type="hidden" name="id" id="paquete-id" value="">
+                <div id="hidden-detalles"></div>
+
+                <div class="space-y-2">
+                    <label for="paquete-nombre" class="text-sm font-medium">Nombre <span class="text-red-500">*</span></label>
+                    <input id="paquete-nombre" name="nombre" type="text" required maxlength="100"
+                           class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                </div>
+
+                <div class="space-y-2">
+                    <label for="paquete-descripcion" class="text-sm font-medium">Descripción</label>
+                    <textarea id="paquete-descripcion" name="descripcion" rows="2"
+                              class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"></textarea>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="space-y-2">
+                        <label for="paquete-precio" class="text-sm font-medium">Precio total (S/)</label>
+                        <input id="paquete-precio" name="precioTotal" type="number" min="0" step="0.01"
+                               class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                    </div>
+                    <div class="space-y-2">
+                        <label for="paquete-sesiones" class="text-sm font-medium">Total sesiones <span class="text-red-500">*</span></label>
+                        <input id="paquete-sesiones" name="totalSesiones" type="number" min="1" step="1" required
+                               class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                               placeholder="Ej. 1, 4, 10">
+                        <p class="text-xs text-muted-foreground">Usado en la web (1 / 4 / 10 sesiones).</p>
+                    </div>
+                </div>
+
+                <div class="rounded-xl border border-border p-4 space-y-3 bg-muted/20">
+                    <p class="text-sm font-medium">Servicios del paquete <span class="text-red-500">*</span></p>
+                    <p class="text-xs text-muted-foreground">Selecciona un servicio y la cantidad de sesiones incluidas, luego agrégalo al paquete.</p>
+
+                    <div class="flex flex-col sm:flex-row gap-2">
+                        <select id="select-servicio"
+                                class="flex h-10 flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                                th:disabled="${#lists.isEmpty(serviciosCatalogo)}">
+                            <option value="">— Elegir servicio —</option>
+                            <option th:each="s : ${serviciosCatalogo}"
+                                    th:value="${s.id}"
+                                    th:text="${s.nombre} + (${s.precioUn != null} ? ' (S/ ' + ${#numbers.formatDecimal(s.precioUn, 1, 2)} + ')' : '')">
+                                Servicio
+                            </option>
+                        </select>
+                        <input id="cantidad-servicio" type="number" min="1" value="1"
+                               class="flex h-10 w-24 rounded-md border border-input bg-background px-3 py-2 text-sm"
+                               title="Cantidad">
+                        <button type="button" onclick="agregarServicioAlPaquete()"
+                                th:disabled="${#lists.isEmpty(serviciosCatalogo)}"
+                                class="inline-flex items-center justify-center rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80 h-10 px-4 text-sm font-medium whitespace-nowrap gap-1.5">
+                            <i data-lucide="plus" class="w-4 h-4"></i> Agregar
+                        </button>
+                    </div>
+
+                    <ul id="lista-servicios-paquete" class="space-y-2 min-h-[2.5rem]">
+                        <li id="lista-vacia" class="text-sm text-muted-foreground py-2 text-center border border-dashed border-border rounded-lg">
+                            Aún no has agregado servicios.
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="cerrarModalPaquete()"
+                            class="inline-flex items-center justify-center rounded-md border border-input bg-background hover:bg-accent h-10 px-4 text-sm font-medium">
+                        Cancelar
+                    </button>
+                    <button type="submit"
+                            class="inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 text-sm font-medium">
+                        Guardar paquete
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        lucide.createIcons();
+
+        var modal = document.getElementById('modal-paquete');
+        var titulo = document.getElementById('modal-paquete-titulo');
+        var form = document.getElementById('form-paquete');
+        var seleccionados = [];
+
+        function nombreDesdeSelect(servicioId) {
+            var opt = document.querySelector('#select-servicio option[value="' + servicioId + '"]');
+            if (!opt) return 'Servicio';
+            return opt.textContent.replace(/\s*\(S\/[^)]*\)\s*$/, '').trim();
+        }
+
+        function abrirModalPaquete() {
+            titulo.textContent = 'Nuevo paquete';
+            document.getElementById('paquete-id').value = '';
+            document.getElementById('paquete-nombre').value = '';
+            document.getElementById('paquete-descripcion').value = '';
+            document.getElementById('paquete-precio').value = '';
+            document.getElementById('paquete-sesiones').value = '';
+            seleccionados = [];
+            renderListaServicios();
+            mostrarModal();
+        }
+
+        function abrirModalEditarPaquete(id) {
+            titulo.textContent = 'Editar paquete';
+            fetch('/admin/paquetes/' + id + '/editar')
+                .then(function (r) {
+                    if (!r.ok) throw new Error('No se pudo cargar el paquete');
+                    return r.json();
+                })
+                .then(function (data) {
+                    document.getElementById('paquete-id').value = data.id || '';
+                    document.getElementById('paquete-nombre').value = data.nombre || '';
+                    document.getElementById('paquete-descripcion').value = data.descripcion || '';
+                    document.getElementById('paquete-precio').value = data.precioTotal != null ? data.precioTotal : '';
+                    document.getElementById('paquete-sesiones').value = data.totalSesiones != null ? data.totalSesiones : '';
+                    seleccionados = (data.detalles || []).map(function (d) {
+                        return {
+                            servicioId: d.servicioId,
+                            nombre: d.nombre,
+                            cantidad: d.cantidad || 1
+                        };
+                    });
+                    renderListaServicios();
+                    mostrarModal();
+                })
+                .catch(function () {
+                    alert('Error al cargar los datos del paquete.');
+                });
+        }
+
+        function mostrarModal() {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            lucide.createIcons();
+        }
+
+        function cerrarModalPaquete() {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function agregarServicioAlPaquete() {
+            var select = document.getElementById('select-servicio');
+            var servicioId = parseInt(select.value, 10);
+            if (!servicioId) {
+                alert('Selecciona un servicio de la lista.');
+                return;
+            }
+            var cantidad = parseInt(document.getElementById('cantidad-servicio').value, 10) || 1;
+            if (cantidad < 1) {
+                alert('La cantidad debe ser al menos 1.');
+                return;
+            }
+            var existente = seleccionados.find(function (s) { return s.servicioId === servicioId; });
+            if (existente) {
+                existente.cantidad = cantidad;
+            } else {
+                seleccionados.push({
+                    servicioId: servicioId,
+                    nombre: nombreDesdeSelect(servicioId),
+                    cantidad: cantidad
+                });
+            }
+            select.value = '';
+            document.getElementById('cantidad-servicio').value = '1';
+            renderListaServicios();
+        }
+
+        function quitarServicio(index) {
+            seleccionados.splice(index, 1);
+            renderListaServicios();
+        }
+
+        function renderListaServicios() {
+            var lista = document.getElementById('lista-servicios-paquete');
+            lista.innerHTML = '';
+            if (seleccionados.length === 0) {
+                var vacio = document.createElement('li');
+                vacio.id = 'lista-vacia';
+                vacio.className = 'text-sm text-muted-foreground py-2 text-center border border-dashed border-border rounded-lg';
+                vacio.textContent = 'Aún no has agregado servicios.';
+                lista.appendChild(vacio);
+                return;
+            }
+            seleccionados.forEach(function (item, index) {
+                var li = document.createElement('li');
+                li.className = 'flex items-center justify-between gap-2 rounded-lg border border-border bg-background px-3 py-2 text-sm';
+                li.innerHTML =
+                    '<span><strong>' + escapeHtml(item.nombre) + '</strong> <span class="text-muted-foreground">× ' + item.cantidad + '</span></span>' +
+                    '<button type="button" class="text-red-500 hover:text-red-700 text-xs font-medium px-2 py-1" data-index="' + index + '">Quitar</button>';
+                li.querySelector('button').addEventListener('click', function () {
+                    quitarServicio(index);
+                });
+                lista.appendChild(li);
+            });
+            lucide.createIcons();
+        }
+
+        function escapeHtml(text) {
+            var div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        form.addEventListener('submit', function (e) {
+            if (seleccionados.length === 0) {
+                e.preventDefault();
+                alert('Agrega al menos un servicio al paquete.');
+                return;
+            }
+            var hidden = document.getElementById('hidden-detalles');
+            hidden.innerHTML = '';
+            seleccionados.forEach(function (item) {
+                var inputId = document.createElement('input');
+                inputId.type = 'hidden';
+                inputId.name = 'servicioIds';
+                inputId.value = item.servicioId;
+                hidden.appendChild(inputId);
+
+                var inputCant = document.createElement('input');
+                inputCant.type = 'hidden';
+                inputCant.name = 'cantidades';
+                inputCant.value = item.cantidad;
+                hidden.appendChild(inputCant);
+            });
+        });
+
+        document.querySelectorAll('.btn-editar-paquete').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                abrirModalEditarPaquete(btn.dataset.id);
+            });
+        });
+
+        modal.addEventListener('click', function (e) {
+            if (e.target === modal) cerrarModalPaquete();
+        });
+
+        function filtrarPaquetes(texto) {
+            var q = (texto || '').trim().toLowerCase();
+            document.querySelectorAll('.fila-paquete').forEach(function (fila) {
+                var nombre = (fila.dataset.nombre || '').toLowerCase();
+                fila.style.display = !q || nombre.includes(q) ? '' : 'none';
+            });
+        }
+    </script>
+</body>
+</html>
