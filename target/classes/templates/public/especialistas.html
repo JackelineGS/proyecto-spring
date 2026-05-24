@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:replace="~{fragments/layout :: head('Profesionales')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: nav('profesionales')}"></div>
+
+<main class="section">
+    <div class="container">
+        <h1 class="section-center" style="margin-bottom: 3rem;">Nuestros Especialistas</h1>
+        <div class="pro-grid">
+            <button type="button"
+                    class="pro-card"
+                    th:each="e : ${empleados}"
+                    th:attr="data-nombre=${e.nombreCompleto},
+                             data-especialidad=${e.especialidadNombre},
+                             data-celular=${e.celular},
+                             data-correo=${e.correo}"
+                    onclick="abrirEspecialista(this)">
+                <div class="pro-card-media">
+                    <img src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=600&q=80" th:alt="${e.nombreCompleto}">
+                </div>
+                <div class="pro-card-body">
+                    <p class="subtitle" th:text="${e.especialidadNombre} ?: 'Psicología clínica'">Especialidad</p>
+                    <h3 th:text="${e.nombreCompleto}">Nombre</h3>
+                </div>
+            </button>
+        </div>
+        <p th:if="${#lists.isEmpty(empleados)}" class="section-center text-muted">No hay especialistas activos en este momento.</p>
+    </div>
+</main>
+
+<div id="modal-especialista" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-especialista-titulo">
+    <div class="modal">
+        <button type="button" class="modal-close" data-modal-close aria-label="Cerrar">&times;</button>
+        <h2 id="modal-especialista-titulo" data-field="nombre">Especialista</h2>
+        <div class="modal-grid">
+            <div>
+                <p class="text-muted"><strong>Especialidad:</strong> <span data-field="especialidad"></span></p>
+                <p class="text-muted"><strong>Celular:</strong> <span data-field="celular"></span></p>
+                <p class="text-muted"><strong>Correo:</strong> <span data-field="correo"></span></p>
+            </div>
+            <div>
+                <img data-field="foto" src="" alt="" style="width:100%;border-radius:0.75rem;aspect-ratio:1;object-fit:cover;background:var(--muted);">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+<script th:src="@{/js/clinic.js}" defer></script>
+<script>
+    function abrirEspecialista(btn) {
+        var modal = document.getElementById('modal-especialista');
+        modal.querySelector('[data-field="nombre"]').textContent = btn.dataset.nombre || '';
+        modal.querySelector('[data-field="especialidad"]').textContent = btn.dataset.especialidad || '—';
+        modal.querySelector('[data-field="celular"]').textContent = btn.dataset.celular || '—';
+        modal.querySelector('[data-field="correo"]').textContent = btn.dataset.correo || '—';
+        var img = modal.querySelector('[data-field="foto"]');
+        img.src = btn.querySelector('img')?.src || '';
+        img.alt = btn.dataset.nombre || '';
+        modal.classList.add('open');
+    }
+</script>
+</body>
+</html>

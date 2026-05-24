@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title} + ' | Digital Health'">Digital Health</title>
+    <link rel="stylesheet" th:href="@{/css/clinic.css}">
+    <link rel="stylesheet" th:href="@{/css/panel.css}">
+</head>
+
+<body>
+
+<header th:fragment="panel-header(tipo, titulo)" class="panel-header">
+    <div class="panel-header-inner">
+        <a th:href="@{/}" class="logo">
+            <span class="logo-icon" aria-hidden="true" th:text="${tipo == 'admin'} ? '🛡' : '♥'">♥</span>
+            <span th:text="${titulo}">Digital Health</span>
+        </a>
+        <a th:href="@{/logout}" class="panel-logout">
+            <span aria-hidden="true">↪</span> Cerrar sesión
+        </a>
+    </div>
+</header>
+
+<aside th:fragment="sidebar-especialista(active)" class="panel-sidebar">
+    <a th:href="@{/especialista/citas}" class="panel-nav-link" th:classappend="${active == 'citas'} ? ' active' : ''">
+        <span aria-hidden="true">📅</span> Citas
+    </a>
+    <a th:href="@{/especialista/historias}" class="panel-nav-link" th:classappend="${active == 'historias'} ? ' active' : ''">
+        <span aria-hidden="true">📁</span> Historias clínicas
+    </a>
+    <a th:href="@{/especialista/horarios}" class="panel-nav-link" th:classappend="${active == 'horarios'} ? ' active' : ''">
+        <span aria-hidden="true">🕐</span> Horarios
+    </a>
+</aside>
+
+<aside th:fragment="sidebar-admin(active)" class="panel-sidebar">
+    <a th:href="@{/admin/empleados}" class="panel-nav-link" th:classappend="${active == 'empleados'} ? ' active' : ''">
+        <span aria-hidden="true">👥</span> Empleados
+    </a>
+    <a th:href="@{/admin/servicios}" class="panel-nav-link" th:classappend="${active == 'servicios'} ? ' active' : ''">
+        <span aria-hidden="true">💼</span> Servicios
+    </a>
+    <a th:href="@{/admin/paquetes}" class="panel-nav-link" th:classappend="${active == 'paquetes'} ? ' active' : ''">
+        <span aria-hidden="true">📦</span> Paquetes
+    </a>
+</aside>
+
+<script th:fragment="panel-scripts" th:src="@{/js/panel.js}" defer></script>
+
+</body>
+</html>

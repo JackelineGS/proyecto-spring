@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Citas - Especialista')}"></head>
+<body class="bg-background text-foreground min-h-screen flex flex-col">
+
+    <div th:replace="~{fragments/especialista-layout :: header}"></div>
+
+    <div class="flex-1 max-w-7xl w-full mx-auto px-6 py-8 grid grid-cols-[220px_1fr] gap-8">
+        <div th:replace="~{fragments/especialista-layout :: sidebar('citas')}"></div>
+
+        <section class="min-w-0">
+            <div class="space-y-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="tracking-tight text-2xl font-medium">Citas</h1>
+                        <p class="text-muted-foreground">Semana del 12 – 16 de mayo, 2026</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button class="inline-flex items-center justify-center rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 w-10 transition-colors">
+                            <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                        </button>
+                        <button class="inline-flex items-center justify-center rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 w-10 transition-colors">
+                            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Grilla de 5 días usando citasPorDia -->
+                <div class="grid grid-cols-5 gap-4">
+                    <div th:each="citasDia, iterStat : ${citasPorDia}" class="space-y-3">
+                        <div class="text-center py-2 border-b border-border">
+                            <p class="text-muted-foreground uppercase tracking-wider text-sm font-medium"
+                               th:text="${dias[iterStat.index]}">Día</p>
+                        </div>
+                        <div class="space-y-3 min-h-[400px]">
+                            <div th:if="${#lists.isEmpty(citasDia)}" class="text-center text-muted-foreground text-sm pt-4">
+                                Sin citas
+                            </div>
+                            <button th:each="cita : ${citasDia}"
+                                    class="w-full text-left rounded-2xl border border-border bg-card p-4 hover:border-primary/50 hover:shadow-sm transition"
+                                    th:attr="onclick='abrirModal(this)'"
+                                    th:data-fecha="${cita.fecha}"
+                                    th:data-hora="${cita.hora}"
+                                    th:data-servicio="${cita.servicio}"
+                                    th:data-paciente="${cita.paciente}"
+                                    th:data-dni="${cita.numDocumento}"
+                                    th:data-estado="${cita.estado}"
+                                    th:data-codigo="${cita.historia.numHc}">
+                                <p class="flex items-center gap-1.5 text-primary font-medium text-sm">
+                                    <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+                                    <span th:text="${cita.hora}">Hora</span>
+                                </p>
+                                <p class="mt-2 flex items-center gap-1.5 text-sm font-medium">
+                                    <i data-lucide="user" class="w-3.5 h-3.5 text-muted-foreground"></i>
+                                    <span th:text="${cita.paciente}">Paciente</span>
+                                </p>
+                                <p class="text-muted-foreground mt-1 text-xs" th:text="${cita.paqueteNombre}">Paquete</p>
+                                <p class="text-muted-foreground mt-0.5 text-xs capitalize" th:text="${cita.estado}">Estado</p>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Modal de detalle de cita -->
+    <div id="modal-cita" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/50 backdrop-blur-sm">
+        <div class="bg-card border border-border rounded-2xl shadow-xl w-full max-w-md mx-4 p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-medium tracking-tight">Detalle de la cita</h2>
+                <button onclick="cerrarModal()" class="text-muted-foreground hover:text-foreground transition">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div class="space-y-4">
+                <div class="rounded-xl border border-border bg-muted/40 p-4 space-y-2">
+                    <p class="flex items-center gap-2 text-sm">
+                        <i data-lucide="calendar" class="w-4 h-4 text-primary"></i>
+                        <span id="modal-fecha"></span>
+                    </p>
+                    <p class="flex items-center gap-2 text-sm">
+                        <i data-lucide="clock" class="w-4 h-4 text-primary"></i>
+                        <span id="modal-hora"></span>
+                    </p>
+                    <span id="modal-servicio-badge" class="inline-block text-xs border border-border rounded-full px-3 py-1 mt-1"></span>
+                </div>
+
+                <div class="space-y-3 text-sm">
+                    <div>
+                        <p class="text-muted-foreground">Paciente</p>
+                        <p id="modal-paciente" class="font-medium"></p>
+                    </div>
+                    <div>
+                        <p class="text-muted-foreground">DNI</p>
+                        <p id="modal-dni"></p>
+                    </div>
+                    <div>
+                        <p class="text-muted-foreground flex items-center gap-1.5">
+                            <i data-lucide="hash" class="w-3.5 h-3.5"></i> Historia clínica
+                        </p>
+                        <p id="modal-codigo"></p>
+                    </div>
+                </div>
+
+                <a id="modal-btn-historia" href="#"
+                   class="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-md h-10 px-4 text-sm font-medium transition-colors">
+                    <i data-lucide="file-text" class="w-4 h-4"></i>
+                    Ver historia clínica
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        function abrirModal(btn) {
+            document.getElementById('modal-fecha').textContent = btn.dataset.fecha;
+            document.getElementById('modal-hora').textContent = btn.dataset.hora;
+            document.getElementById('modal-servicio-badge').textContent = btn.dataset.servicio;
+            document.getElementById('modal-paciente').textContent = btn.dataset.paciente;
+            document.getElementById('modal-dni').textContent = btn.dataset.dni;
+            document.getElementById('modal-codigo').textContent = btn.dataset.codigo;
+            document.getElementById('modal-btn-historia').href = '/especialista/historias?tipo=codigo&valor=' + encodeURIComponent(btn.dataset.codigo);
+            document.getElementById('modal-cita').classList.remove('hidden');
+        }
+
+        function cerrarModal() {
+            document.getElementById('modal-cita').classList.add('hidden');
+        }
+
+        // Cerrar modal al hacer clic en el fondo
+        document.getElementById('modal-cita').addEventListener('click', function(e) {
+            if (e.target === this) cerrarModal();
+        });
+    </script>
+</body>
+</html>
