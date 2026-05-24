@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Empleados - Administración')}"></head>
+<body class="bg-background text-foreground min-h-screen flex flex-col">
+
+    <div th:replace="~{fragments/admin-layout :: header}"></div>
+
+    <div class="flex-1 max-w-[1400px] w-full mx-auto px-6 py-8 grid grid-cols-[220px_1fr] gap-8">
+        <div th:replace="~{fragments/admin-layout :: sidebar('empleados')}"></div>
+
+        <section class="min-w-0">
+            <div class="space-y-6">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                        <h1 class="tracking-tight text-2xl font-medium">Empleados</h1>
+                        <p class="text-muted-foreground">Gestiona el equipo de la clínica.</p>
+                    </div>
+                    <button type="button" onclick="abrirModalEmpleado()" class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 gap-2">
+                        <i data-lucide="plus" class="w-4 h-4"></i> Agregar empleado
+                    </button>
+                </div>
+
+                <div th:if="${mensaje}"
+                     class="rounded-md border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-700"
+                     th:text="${mensaje}"></div>
+                <div th:if="${error}"
+                     class="rounded-md border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-600"
+                     th:text="${error}"></div>
+
+                <div class="grid sm:grid-cols-[1fr_240px_200px] gap-3 items-center">
+                    <div class="relative">
+                        <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"></i>
+                        <input placeholder="Buscar empleado"
+                               class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm pl-9">
+                    </div>
+                    <select class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+                        <option value="all">Todos los roles</option>
+                    </select>
+                    <select class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+                        <option value="all">Todos</option>
+                        <option value="activos">Solo activos</option>
+                        <option value="inactivos">Solo inactivos</option>
+                    </select>
+                </div>
+
+                <div class="rounded-2xl border border-border overflow-hidden">
+                    <table class="w-full">
+                        <thead class="bg-muted/50 text-muted-foreground">
+                            <tr class="text-left">
+                                <th class="w-10 py-3 px-4"></th>
+                                <th class="py-3 px-4 text-sm font-medium">Nombre</th>
+                                <th class="py-3 px-4 text-sm font-medium">Correo</th>
+                                <th class="py-3 px-4 text-sm font-medium">Celular</th>
+                                <th class="py-3 px-4 text-sm font-medium">Rol</th>
+                                <th class="py-3 px-4 text-sm font-medium">Especialidad</th>
+                                <th class="py-3 px-4 w-24"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="empleado, stat : ${empleados}"
+                                class="border-t border-border"
+                                th:classappend="${stat.odd} ? ' bg-muted/20' : ''">
+                                <td class="py-3 px-4">
+                                    <span th:class="${empleado.estado} ? 'block w-2.5 h-2.5 rounded-full bg-emerald-500' : 'block w-2.5 h-2.5 rounded-full bg-red-500'"
+                                          th:title="${empleado.estado} ? 'Activo' : 'Inactivo'"></span>
+                                </td>
+                                <td class="py-3 px-4 text-sm" th:text="${empleado.nombreCompleto}">Nombre</td>
+                                <td class="py-3 px-4 text-sm text-muted-foreground" th:text="${empleado.correo}">Correo</td>
+                                <td class="py-3 px-4 text-sm text-muted-foreground" th:text="${empleado.celular} ?: '—'">Celular</td>
+                                <td class="py-3 px-4">
+                                    <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold border-border"
+                                          th:text="${empleado.rol}">Rol</span>
+                                </td>
+                                <td class="py-3 px-4 text-sm text-muted-foreground"
+                                    th:text="${empleado.especialidadNombre} ?: '—'">Especialidad</td>
+                                <td class="py-3 px-4">
+                                    <button type="button" class="btn-editar inline-flex items-center justify-center rounded-md border border-input bg-background hover:bg-accent h-9 px-3 gap-1.5 text-sm"
+                                            th:attr="data-id=${empleado.id},
+                                                     data-nombre=${empleado.nombre},
+                                                     data-apellido=${empleado.apellido},
+                                                     data-correo=${empleado.correo},
+                                                     data-celular=${empleado.celular},
+                                                     data-rol=${empleado.rol},
+                                                     data-especialidadid=${empleado.especialidad != null ? empleado.especialidad.id : ''},
+                                                     data-estado=${empleado.estado}">
+                                        <i data-lucide="pencil" class="w-3.5 h-3.5"></i> Editar
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(empleados)}">
+                                <td colspan="7" class="py-12 text-center text-sm text-muted-foreground">
+                                    No hay empleados registrados.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Modal crear / editar -->
+    <div id="modal-empleado" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+        <div class="bg-card border border-border rounded-2xl shadow-xl w-full max-w-md p-6">
+            <div class="flex items-center justify-between mb-5">
+                <h2 id="modal-empleado-titulo" class="text-lg font-medium tracking-tight">Nuevo empleado</h2>
+                <button type="button" onclick="cerrarModalEmpleado()" class="text-muted-foreground hover:text-foreground p-1 rounded-md hover:bg-accent">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <form th:action="@{/admin/empleados/guardar}" method="post" class="space-y-4">
+                <input type="hidden" name="id" id="empleado-id" value="">
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <label for="empleado-nombre" class="text-sm font-medium">Nombre <span class="text-red-500">*</span></label>
+                        <input id="empleado-nombre" name="nombre" type="text" required maxlength="100"
+                               class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                    </div>
+                    <div class="space-y-2">
+                        <label for="empleado-apellido" class="text-sm font-medium">Apellido</label>
+                        <input id="empleado-apellido" name="apellido" type="text" maxlength="100"
+                               class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <label for="empleado-correo" class="text-sm font-medium">Correo</label>
+                    <input id="empleado-correo" name="correo" type="email" maxlength="100"
+                           class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <label for="empleado-celular" class="text-sm font-medium">Celular</label>
+                        <input id="empleado-celular" name="celular" type="text" maxlength="20"
+                               class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                    </div>
+                    <div class="space-y-2">
+                        <label for="empleado-rol" class="text-sm font-medium">Rol</label>
+                        <input id="empleado-rol" name="rol" type="text" maxlength="50"
+                               class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <label for="empleado-especialidad" class="text-sm font-medium">Especialidad</label>
+                    <select id="empleado-especialidad" name="especialidadId"
+                            class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                        <option value="">Sin especialidad</option>
+                        <option th:each="esp : ${especialidades}"
+                                th:value="${esp.id}"
+                                th:text="${esp.nombre}"></option>
+                    </select>
+                </div>
+                
+                <div class="space-y-2 flex items-center gap-2 mt-4">
+                    <input type="checkbox" id="empleado-estado" name="estado" value="true" class="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary">
+                    <label for="empleado-estado" class="text-sm font-medium mb-0">Empleado Activo</label>
+                </div>
+
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="cerrarModalEmpleado()"
+                            class="inline-flex items-center justify-center rounded-md border border-input bg-background hover:bg-accent h-10 px-4 text-sm font-medium">
+                        Cancelar
+                    </button>
+                    <button type="submit"
+                            class="inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 text-sm font-medium">
+                        Guardar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        var modalEmpleado = document.getElementById('modal-empleado');
+        var tituloEmpleado = document.getElementById('modal-empleado-titulo');
+        var inputId = document.getElementById('empleado-id');
+        var inputNombre = document.getElementById('empleado-nombre');
+        var inputApellido = document.getElementById('empleado-apellido');
+        var inputCorreo = document.getElementById('empleado-correo');
+        var inputCelular = document.getElementById('empleado-celular');
+        var inputRol = document.getElementById('empleado-rol');
+        var inputEspecialidad = document.getElementById('empleado-especialidad');
+        var inputEstado = document.getElementById('empleado-estado');
+
+        function abrirModalEmpleado() {
+            tituloEmpleado.textContent = 'Nuevo empleado';
+            inputId.value = '';
+            inputNombre.value = '';
+            inputApellido.value = '';
+            inputCorreo.value = '';
+            inputCelular.value = '';
+            inputRol.value = '';
+            inputEspecialidad.value = '';
+            inputEstado.checked = true;
+            mostrarModal();
+        }
+
+        function abrirModalEditar(btn) {
+            tituloEmpleado.textContent = 'Editar empleado';
+            inputId.value = btn.dataset.id || '';
+            inputNombre.value = btn.dataset.nombre || '';
+            inputApellido.value = btn.dataset.apellido || '';
+            inputCorreo.value = btn.dataset.correo || '';
+            inputCelular.value = btn.dataset.celular || '';
+            inputRol.value = btn.dataset.rol || '';
+            inputEspecialidad.value = btn.dataset.especialidadid || '';
+            inputEstado.checked = btn.dataset.estado === 'true';
+            mostrarModal();
+        }
+
+        function mostrarModal() {
+            modalEmpleado.classList.remove('hidden');
+            modalEmpleado.classList.add('flex');
+        }
+
+        function cerrarModalEmpleado() {
+            modalEmpleado.classList.add('hidden');
+            modalEmpleado.classList.remove('flex');
+        }
+
+        document.querySelectorAll('.btn-editar').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                abrirModalEditar(btn);
+            });
+        });
+
+        modalEmpleado.addEventListener('click', function (e) {
+            if (e.target === modalEmpleado) cerrarModalEmpleado();
+        });
+    </script>
+</body>
+</html>

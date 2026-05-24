@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<body>
+
+<div th:fragment="modal" id="modal-historia" class="modal-overlay modal-historia-wrap" role="dialog" aria-modal="true">
+    <div class="modal modal-historia">
+        <button type="button" class="modal-close" data-modal-close aria-label="Cerrar">×</button>
+
+        <div class="historia-header card panel-card">
+            <div class="historia-header-top">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <h2 id="hc-paciente" style="margin: 0;">Paciente</h2>
+                    <button type="button" class="btn btn-outline btn-sm" id="btn-edit-paciente" title="Editar datos del paciente" style="padding: 0.1rem 0.4rem; border: none; background: none; font-size: 1.2rem; cursor: pointer;">✎</button>
+                </div>
+                <div class="historia-badges">
+                    <span class="badge" id="hc-documento">DNI</span>
+                    <span class="badge" id="hc-codigo">HC-000</span>
+                </div>
+            </div>
+            <div class="historia-grid">
+                <div><p class="text-muted">Fecha de nacimiento</p><p id="hc-fecha-nac"></p></div>
+                <div><p class="text-muted">Sexo</p><p id="hc-sexo"></p></div>
+                <div><p class="text-muted">Grado de instrucción</p><p id="hc-grado"></p></div>
+                <div><p class="text-muted">Ocupación</p><p id="hc-ocupacion"></p></div>
+                <div><p class="text-muted">Última cita</p><p id="hc-ultima"></p></div>
+                <div><p class="text-muted">N° hijos</p><p id="hc-hijos"></p></div>
+                <div><p class="text-muted">Lugar de residencia</p><p id="hc-residencia"></p></div>
+            </div>
+        </div>
+
+        <div class="hc-tabs">
+            <div class="hc-tabs-list">
+                <button type="button" class="hc-tab active" data-hc-tab="anamnesis">Anamnesis</button>
+                <button type="button" class="hc-tab" data-hc-tab="diagnostico">Diagnóstico</button>
+                <button type="button" class="hc-tab" data-hc-tab="visitas">Visitas</button>
+                <button type="button" class="hc-tab" data-hc-tab="psicofarmacos">Psicofármacos</button>
+                <button type="button" class="hc-tab" data-hc-tab="evaluacion">Evaluación</button>
+            </div>
+
+            <!-- ANAMNESIS -->
+            <div class="hc-tab-panel active" data-hc-panel="anamnesis">
+                <div class="hc-panel-toolbar">
+                    <button type="button" class="btn btn-outline btn-sm" id="btn-toggle-anamnesis">
+                        ✎ Editar anamnesis
+                    </button>
+                </div>
+                <div class="card panel-card">
+                    <label class="field-label" for="hc-motivo">Motivo de consulta</label>
+                    <textarea id="hc-motivo" class="form-control hc-editable" rows="3" disabled placeholder="Sin registrar"></textarea>
+                </div>
+                <div class="card panel-card">
+                    <h3>Historia personal y social</h3>
+                    <label class="field-label" for="hc-ninez">Niñez</label>
+                    <textarea id="hc-ninez" class="form-control hc-editable" rows="2" disabled></textarea>
+                    <label class="field-label" for="hc-adolescencia">Adolescencia</label>
+                    <textarea id="hc-adolescencia" class="form-control hc-editable" rows="2" disabled></textarea>
+                    <label class="field-label" for="hc-adultez">Adultez</label>
+                    <textarea id="hc-adultez" class="form-control hc-editable" rows="2" disabled></textarea>
+                    <label class="field-label" for="hc-sustancias">Uso de sustancias</label>
+                    <textarea id="hc-sustancias" class="form-control hc-editable" rows="2" disabled></textarea>
+                </div>
+                <div class="card panel-card">
+                    <h3>Historia familiar</h3>
+                    <label class="field-label" for="hc-madre">Madre</label>
+                    <textarea id="hc-madre" class="form-control hc-editable" rows="2" disabled></textarea>
+                    <label class="field-label" for="hc-padre">Padre</label>
+                    <textarea id="hc-padre" class="form-control hc-editable" rows="2" disabled></textarea>
+                    <label class="field-label" for="hc-hermanos">Hermanos</label>
+                    <textarea id="hc-hermanos" class="form-control hc-editable" rows="2" disabled></textarea>
+                    <label class="field-label" for="hc-pareja">Pareja actual</label>
+                    <textarea id="hc-pareja" class="form-control hc-editable" rows="2" disabled></textarea>
+                    <label class="field-label" for="hc-hijos-fam">Hijos</label>
+                    <textarea id="hc-hijos-fam" class="form-control hc-editable" rows="2" disabled></textarea>
+                </div>
+            </div>
+
+            <!-- DIAGNÓSTICO -->
+            <div class="hc-tab-panel" data-hc-panel="diagnostico">
+                <div class="card panel-card">
+                    <div class="hc-section-header">
+                        <p class="section-label">Diagnósticos activos (CIE-10 / DSM-5)</p>
+                        <button type="button" class="btn btn-primary btn-sm" id="btn-add-diagnostico">+ Agregar</button>
+                    </div>
+                    <div id="hc-diagnosticos-list"></div>
+                </div>
+            </div>
+
+            <!-- VISITAS -->
+            <div class="hc-tab-panel" data-hc-panel="visitas">
+                <div class="card panel-card table-wrap">
+                    <div class="hc-section-header">
+                        <p class="section-label">Historial de visitas</p>
+                        <button type="button" class="btn btn-primary btn-sm" id="btn-add-visita">+ Agregar</button>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                        <tr><th>Fecha</th><th>Hora</th><th>Sesión</th><th>Descripción</th><th>Estado</th><th></th></tr>
+                        </thead>
+                        <tbody id="hc-visitas-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- PSICOFÁRMACOS -->
+            <div class="hc-tab-panel" data-hc-panel="psicofarmacos">
+                <div class="card panel-card">
+                    <div class="hc-section-header">
+                        <p class="section-label">Medicación</p>
+                        <button type="button" class="btn btn-primary btn-sm" id="btn-add-medicacion">+ Agregar</button>
+                    </div>
+                    <div id="hc-medicacion-list"></div>
+                </div>
+            </div>
+
+            <!-- EVALUACIÓN -->
+            <div class="hc-tab-panel" data-hc-panel="evaluacion">
+                <div class="hc-section-header" style="margin-bottom:1rem;">
+                    <p class="section-label">Evaluaciones psicométricas aplicadas</p>
+                    <button type="button" class="btn btn-primary btn-sm" id="btn-add-evaluacion">+ Agregar</button>
+                </div>
+                <div class="evaluacion-grid" id="hc-evaluacion-grid"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sub-modal: Diagnóstico -->
+<div id="modal-diag" class="modal-overlay modal-nested">
+    <div class="modal modal-md">
+        <button type="button" class="modal-close" data-modal-close-nested>×</button>
+        <h2 id="modal-diag-titulo">Nuevo diagnóstico</h2>
+        <div class="form-group">
+            <label for="diag-codigo">Código CIE-10 / DSM-5</label>
+            <input type="text" id="diag-codigo" class="form-control font-mono" placeholder="Ej. F41.1">
+            <p class="form-hint text-muted">El concepto se rellena automáticamente desde el código.</p>
+        </div>
+        <div class="form-group">
+            <label for="diag-nombre">Concepto</label>
+            <input type="text" id="diag-nombre" class="form-control" disabled placeholder="Se completa al ingresar un código válido">
+        </div>
+        <div class="checkbox-row">
+            <input type="checkbox" id="diag-confirmar">
+            <label for="diag-confirmar" class="text-muted">Confirmo que el diagnóstico es correcto.</label>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-outline" data-modal-close-nested>Cancelar</button>
+            <button type="button" class="btn btn-primary" id="btn-guardar-diag" disabled>Guardar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Sub-modal: Visita -->
+<div id="modal-visita" class="modal-overlay modal-nested">
+    <div class="modal modal-md">
+        <button type="button" class="modal-close" data-modal-close-nested>×</button>
+        <h2 id="modal-visita-titulo">Nueva visita</h2>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="visita-fecha">Fecha</label>
+                <input type="date" id="visita-fecha" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="visita-hora">Hora</label>
+                <input type="time" id="visita-hora" class="form-control">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="visita-sesion">Número de sesión</label>
+            <input type="number" id="visita-sesion" class="form-control" min="1" value="1">
+        </div>
+        <div class="form-group">
+            <label for="visita-descripcion">Descripción</label>
+            <textarea id="visita-descripcion" class="form-control" rows="3"></textarea>
+        </div>
+        <div class="form-group">
+            <label for="visita-estado">Estado</label>
+            <select id="visita-estado" class="form-control">
+                <option value="Completada">Completada</option>
+                <option value="Pendiente">Pendiente</option>
+            </select>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-outline" data-modal-close-nested>Cancelar</button>
+            <button type="button" class="btn btn-primary" id="btn-guardar-visita">Guardar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Sub-modal: Psicofármaco -->
+<div id="modal-medicacion" class="modal-overlay modal-nested">
+    <div class="modal modal-md">
+        <button type="button" class="modal-close" data-modal-close-nested>×</button>
+        <h2 id="modal-med-titulo">Nuevo psicofármaco</h2>
+        <div class="form-group">
+            <label for="med-nombre">Nombre y presentación</label>
+            <input type="text" id="med-nombre" class="form-control" placeholder="Ej. Sertralina 50 mg">
+        </div>
+        <div class="form-group">
+            <label for="med-dosis">Dosis</label>
+            <input type="text" id="med-dosis" class="form-control" placeholder="Ej. 1 comprimido cada 8 horas">
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="med-desde">Desde</label>
+                <input type="date" id="med-desde" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="med-hasta">Hasta</label>
+                <input type="date" id="med-hasta" class="form-control">
+            </div>
+        </div>
+        <div class="checkbox-row">
+            <input type="checkbox" id="med-actualidad">
+            <label for="med-actualidad" class="text-muted">Actualidad (tratamiento permanente)</label>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-outline" data-modal-close-nested>Cancelar</button>
+            <button type="button" class="btn btn-primary" id="btn-guardar-medicacion">Guardar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Sub-modal: Evaluación -->
+<div id="modal-evaluacion" class="modal-overlay modal-nested">
+    <div class="modal modal-md">
+        <button type="button" class="modal-close" data-modal-close-nested>×</button>
+        <h2 id="modal-evaluacion-titulo">Nueva evaluación</h2>
+        <div class="form-group">
+            <label for="evaluacion-nombre">Nombre de la evaluación</label>
+            <input type="text" id="evaluacion-nombre" class="form-control" placeholder="Ej. GAD-7 — Ansiedad Generalizada">
+        </div>
+        <div class="form-group">
+            <label for="evaluacion-interp">Interpretación</label>
+            <input type="text" id="evaluacion-interp" class="form-control" placeholder="Ej. Severa (>15)">
+        </div>
+        <div class="form-group">
+            <label for="evaluacion-puntaje">Puntaje</label>
+            <input type="text" id="evaluacion-puntaje" class="form-control" placeholder="Ej. 15/21">
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-outline" data-modal-close-nested>Cancelar</button>
+            <button type="button" class="btn btn-primary" id="btn-guardar-evaluacion">Guardar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Sub-modal: Ver descripción visita -->
+<div id="modal-visita-desc" class="modal-overlay modal-nested">
+    <div class="modal modal-md">
+        <button type="button" class="modal-close" data-modal-close-nested>×</button>
+        <h2 id="modal-visita-desc-titulo">Descripción</h2>
+        <p id="modal-visita-desc-texto" class="visita-desc-full"></p>
+    </div>
+</div>
+
+</body>
+</html>
