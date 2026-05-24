@@ -23,7 +23,7 @@ public class Visita {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_cita", nullable = false)
+    @JoinColumn(name = "id_cita", nullable = true)
     private Cita cita;
 
     @ManyToOne(fetch = FetchType.LAZY)

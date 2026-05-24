@@ -25,6 +25,7 @@ public final class HistoriaClinicaMapper {
         dto.setNumDocumento(h.getPaciente().getNumDocumento());
         if (h.getPaciente().getFechaNacimiento() != null) {
             dto.setFechaNacimiento(FECHA.format(h.getPaciente().getFechaNacimiento()));
+            dto.setFechaNacimientoIso(h.getPaciente().getFechaNacimiento().toString());
             dto.setEdad(Period.between(h.getPaciente().getFechaNacimiento(), LocalDate.now()).getYears());
         }
         dto.setSexo(h.getPaciente().getSexo());
@@ -32,6 +33,8 @@ public final class HistoriaClinicaMapper {
         dto.setOcupacion(h.getPaciente().getOcupacion());
         dto.setNumeroHijos(h.getPaciente().getNumHijos() != null ? h.getPaciente().getNumHijos() : 0);
         dto.setResidencia(h.getPaciente().getResidencia());
+        dto.setCelular(h.getPaciente().getCelular());
+        dto.setCorreo(h.getPaciente().getCorreo());
         dto.setMotivoConsulta(h.getMotivoConsulta());
         dto.setHistNinez(h.getHistNinez());
         dto.setHistAdolescencia(h.getHistAdolescencia());

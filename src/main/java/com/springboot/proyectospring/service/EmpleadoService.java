@@ -47,6 +47,15 @@ public class EmpleadoService {
         empleado.setRol(form.getRol());
         empleado.setEstado(form.getEstado() != null ? form.getEstado() : false);
 
+        boolean esNuevo = form.getId() == null;
+        if (esNuevo) {
+            if (form.getContrasenia() == null || form.getContrasenia().isBlank())
+                throw new IllegalArgumentException("La contraseña es obligatoria al crear un empleado.");
+            empleado.setContrasenia(form.getContrasenia().trim());
+        } else if (form.getContrasenia() != null && !form.getContrasenia().isBlank()) {
+            empleado.setContrasenia(form.getContrasenia().trim());
+        }
+
         if (form.getEspecialidadId() != null) {
             empleado.setEspecialidad(especialidadRepository.findById(form.getEspecialidadId()).orElse(null));
         } else {

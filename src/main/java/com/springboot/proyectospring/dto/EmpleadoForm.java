@@ -10,6 +10,7 @@ public class EmpleadoForm {
     private String rol;
     private Boolean estado;
     private Integer especialidadId;
+    private String contrasenia;
 
     public Long getId() {
         return id;
@@ -73,5 +74,13 @@ public class EmpleadoForm {
 
     public void setEspecialidadId(Integer especialidadId) {
         this.especialidadId = especialidadId;
+    }
+
+    public String getContrasenia() {
+        return contrasenia;
+    }
+
+    public void setContrasenia(String contrasenia) {
+        this.contrasenia = contrasenia;
     }
 }

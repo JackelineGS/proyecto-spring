@@ -22,7 +22,10 @@
         (<span th:text="${confirmacion.documento}">—</span>)
         · Método de pago: <span th:text="${confirmacion.metodoPago}">—</span>
     </p>
-    <a th:href="@{/}" class="btn btn-primary">Volver al inicio</a>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-top:1rem;">
+        <a th:href="@{/comprobante/{id}(id=${confirmacion.pagoId})}" class="btn btn-primary">Ver comprobante</a>
+        <a th:href="@{/}" class="btn btn-outline">Volver al inicio</a>
+    </div>
 </main>
 
 <div th:replace="~{fragments/layout :: footer}"></div>

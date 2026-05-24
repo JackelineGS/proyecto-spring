@@ -9,6 +9,7 @@ public class HistoriaClinicaDetalle {
     private String paciente;
     private String numDocumento;
     private String fechaNacimiento;
+    private String fechaNacimientoIso;
     private int edad;
     private String sexo;
     private String gradoInstruccion;
@@ -16,6 +17,8 @@ public class HistoriaClinicaDetalle {
     private String ultimaCita;
     private int numeroHijos;
     private String residencia;
+    private String celular;
+    private String correo;
     private String motivoConsulta;
     private String histNinez;
     private String histAdolescencia;
@@ -61,6 +64,30 @@ public class HistoriaClinicaDetalle {
 
     public void setFechaNacimiento(String fechaNacimiento) {
         this.fechaNacimiento = fechaNacimiento;
+    }
+
+    public String getFechaNacimientoIso() {
+        return fechaNacimientoIso;
+    }
+
+    public void setFechaNacimientoIso(String fechaNacimientoIso) {
+        this.fechaNacimientoIso = fechaNacimientoIso;
+    }
+
+    public String getCelular() {
+        return celular;
+    }
+
+    public void setCelular(String celular) {
+        this.celular = celular;
+    }
+
+    public String getCorreo() {
+        return correo;
+    }
+
+    public void setCorreo(String correo) {
+        this.correo = correo;
     }
 
     public int getEdad() {

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Comprobante de Pago</title>
+</head>
+<body style="margin:0;padding:0;background:#f3f4f6;font-family:'Segoe UI',Arial,sans-serif;font-size:14px;color:#1a1a1a;">
+
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f3f4f6;padding:2rem 0;">
+    <tr>
+        <td align="center">
+            <table width="600" cellpadding="0" cellspacing="0"
+                   style="background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.08);">
+
+                <!-- Header -->
+                <tr>
+                    <td style="background:#1e3a5f;padding:1.75rem 2rem;">
+                        <table width="100%" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td>
+                                    <div style="font-size:1.4rem;font-weight:700;color:#fff;">Digital Health</div>
+                                    <div style="font-size:.82rem;color:rgba(255,255,255,.75);margin-top:.2rem;">Psicología y Salud Mental</div>
+                                </td>
+                                <td align="right">
+                                    <div style="font-size:.7rem;color:rgba(255,255,255,.7);letter-spacing:1px;text-transform:uppercase;"
+                                         th:text="${tipoComprobante == 'factura' ? 'Factura Electrónica' : 'Boleta de Venta'}">
+                                        Boleta de Venta
+                                    </div>
+                                    <div style="font-size:1.2rem;font-weight:700;color:#fff;margin:.2rem 0;"
+                                         th:text="${numeroComprobante}">B-2025-00001</div>
+                                    <div style="font-size:.78rem;color:rgba(255,255,255,.7);"
+                                         th:text="'Fecha: ' + ${fechaPago}">Fecha</div>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+
+                <!-- Saludo -->
+                <tr>
+                    <td style="padding:1.5rem 2rem 0;">
+                        <p style="font-size:1rem;margin:0;">
+                            Hola <strong th:text="${pacienteNombre}">Paciente</strong>,
+                        </p>
+                        <p style="color:#6b7280;margin:.5rem 0 0;">
+                            Tu pago ha sido registrado exitosamente. A continuación encontrarás el detalle de tu comprobante.
+                        </p>
+                    </td>
+                </tr>
+
+                <!-- Datos del cliente -->
+                <tr>
+                    <td style="padding:1.25rem 2rem 0;">
+                        <div style="font-size:.68rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#6b7280;border-bottom:1px solid #e5e7eb;padding-bottom:.4rem;margin-bottom:.75rem;">
+                            Datos del Cliente
+                        </div>
+                        <table width="100%" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td style="padding:.2rem 0;color:#9ca3af;font-size:.72rem;"
+                                    th:text="${tipoComprobante == 'factura' ? 'RUC' : 'DNI'}">DNI</td>
+                                <td style="padding:.2rem 0;color:#9ca3af;font-size:.72rem;">Cliente</td>
+                                <td style="padding:.2rem 0;color:#9ca3af;font-size:.72rem;">Correo</td>
+                            </tr>
+                            <tr>
+                                <td style="font-weight:500;" th:text="${pacienteDni}">—</td>
+                                <td style="font-weight:500;" th:text="${pacienteNombre}">—</td>
+                                <td style="font-weight:500;" th:text="${pacienteCorreo}">—</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+
+                <!-- Detalle del servicio -->
+                <tr>
+                    <td style="padding:1.25rem 2rem 0;">
+                        <div style="font-size:.68rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#6b7280;border-bottom:1px solid #e5e7eb;padding-bottom:.4rem;margin-bottom:.75rem;">
+                            Detalle del Servicio
+                        </div>
+                        <table width="100%" cellpadding="6" cellspacing="0"
+                               style="border-collapse:collapse;">
+                            <thead>
+                            <tr style="background:#f9fafb;">
+                                <th style="text-align:left;font-size:.72rem;color:#6b7280;font-weight:600;letter-spacing:.5px;text-transform:uppercase;padding:.5rem .75rem;">Paquete</th>
+                                <th style="text-align:center;font-size:.72rem;color:#6b7280;font-weight:600;letter-spacing:.5px;text-transform:uppercase;padding:.5rem .75rem;">Sesiones</th>
+                                <th style="text-align:right;font-size:.72rem;color:#6b7280;font-weight:600;letter-spacing:.5px;text-transform:uppercase;padding:.5rem .75rem;">Total</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td style="padding:.75rem;border-bottom:1px solid #f3f4f6;font-weight:500;"
+                                    th:text="${paqueteNombre}">Paquete</td>
+                                <td style="padding:.75rem;border-bottom:1px solid #f3f4f6;text-align:center;"
+                                    th:text="${paqueteSesiones}">1</td>
+                                <td style="padding:.75rem;border-bottom:1px solid #f3f4f6;text-align:right;"
+                                    th:text="'S/ ' + ${monto}">S/ 0.00</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <!-- Total -->
+                        <table width="100%" cellpadding="0" cellspacing="0"
+                               style="margin-top:.5rem;border-top:2px solid #1e3a5f;padding-top:.75rem;">
+                            <tr>
+                                <td align="right"
+                                    style="font-size:1.05rem;font-weight:700;color:#1e3a5f;padding:.5rem 0;"
+                                    th:text="'Total: S/ ' + ${monto}">Total: S/ 0.00</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+
+                <!-- Detalle de la cita -->
+                <tr>
+                    <td style="padding:1.25rem 2rem 0;">
+                        <div style="font-size:.68rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#6b7280;border-bottom:1px solid #e5e7eb;padding-bottom:.4rem;margin-bottom:.75rem;">
+                            Detalle de la Cita
+                        </div>
+                        <table width="100%" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td style="color:#9ca3af;font-size:.72rem;padding:.2rem 0;">Especialista</td>
+                                <td style="color:#9ca3af;font-size:.72rem;padding:.2rem 0;">Fecha</td>
+                                <td style="color:#9ca3af;font-size:.72rem;padding:.2rem 0;">Hora</td>
+                                <td style="color:#9ca3af;font-size:.72rem;padding:.2rem 0;">Método de pago</td>
+                            </tr>
+                            <tr>
+                                <td style="font-weight:500;padding-bottom:.5rem;" th:text="${empleado}">—</td>
+                                <td style="font-weight:500;padding-bottom:.5rem;" th:text="${fechaCita}">—</td>
+                                <td style="font-weight:500;padding-bottom:.5rem;" th:text="${horaCita}">—</td>
+                                <td>
+                                    <span style="display:inline-block;padding:.2rem .6rem;border-radius:999px;font-size:.75rem;font-weight:600;background:#eff6ff;color:#1d4ed8;"
+                                          th:text="${metodoPago}">—</span>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+
+                <!-- Enlace al comprobante -->
+                <tr>
+                    <td style="padding:1.5rem 2rem;text-align:center;">
+                        <a th:href="@{/comprobante/{id}(id=${pagoId})}"
+                           style="display:inline-block;background:#1e3a5f;color:#fff;padding:.65rem 1.5rem;border-radius:8px;text-decoration:none;font-weight:600;font-size:.9rem;">
+                            Ver comprobante completo
+                        </a>
+                    </td>
+                </tr>
+
+                <!-- Footer -->
+                <tr>
+                    <td style="background:#f9fafb;border-top:1px solid #e5e7eb;padding:1.25rem 2rem;text-align:center;color:#6b7280;font-size:.8rem;line-height:1.6;">
+                        Si tienes alguna duda escríbenos al <strong>+51 923 826 177</strong>
+                        o a <strong>contacto@digitalhealth.pe</strong>.<br>
+                        <span style="font-size:.72rem;">© 2025 Digital Health · Psicología y Salud Mental</span>
+                    </td>
+                </tr>
+
+            </table>
+        </td>
+    </tr>
+</table>
+
+</body>
+</html>

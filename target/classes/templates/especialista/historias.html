@@ -12,6 +12,12 @@
         <div class="space-y-6 max-w-3xl">
             <h1 class="tracking-tight text-2xl font-medium">Buscar historia clínica</h1>
 
+            <div th:if="${mensaje}"
+                 class="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700 flex items-center gap-2">
+                <i data-lucide="check-circle" class="w-4 h-4 shrink-0"></i>
+                <span th:text="${mensaje}"></span>
+            </div>
+
             <div class="rounded-2xl border border-border bg-card p-6 space-y-5">
                 <form th:action="@{/especialista/historias}" method="get" class="space-y-5">
 
@@ -75,7 +81,7 @@
 </div>
 
 <div id="modal-historia" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/50 backdrop-blur-sm">
-    <div class="bg-card border border-border rounded-2xl shadow-xl w-[98vw] max-w-[950px] mx-4 p-0 overflow-y-auto max-h-[95vh]">
+    <div class="bg-white border border-border rounded-2xl shadow-xl w-[98vw] max-w-[950px] mx-4 p-0 overflow-y-auto max-h-[95vh]">
 
         <div class="p-6 sm:p-8 space-y-6">
             <div class="flex items-center justify-between">
@@ -101,11 +107,12 @@
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                         <div>
                             <p class="text-muted-foreground text-xs">Fecha de nacimiento</p>
-                            <p class="font-medium text-foreground" th:text="${resultado.fechaNacimiento} + ' (' + ${resultado.edad} + ' a.)'">—</p>
+                            <p class="font-medium text-foreground"
+                               th:text="${resultado.fechaNacimiento != null ? resultado.fechaNacimiento + ' (' + resultado.edad + ' a.)' : '—'}">—</p>
                         </div>
                         <div>
                             <p class="text-muted-foreground text-xs">Sexo</p>
-                            <p class="font-medium text-foreground" th:text="${resultado.sexo}">—</p>
+                            <p class="font-medium text-foreground" th:text="${resultado.sexo} ?: '—'">—</p>
                         </div>
                         <div>
                             <p class="text-muted-foreground text-xs">Grado de instrucción</p>
@@ -283,7 +290,7 @@
 <div th:if="${resultado != null}">
     <!-- Modal Editar Paciente -->
     <div id="modal-editar-paciente" class="fixed inset-0 z-[60] hidden flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-        <div class="bg-card border border-border rounded-xl shadow-xl w-full max-w-md overflow-hidden flex flex-col max-h-full">
+        <div class="bg-white border border-border rounded-xl shadow-xl w-full max-w-md overflow-hidden flex flex-col max-h-full">
             <div class="p-5 border-b border-border flex items-center justify-between bg-muted/30">
                 <h3 class="font-medium tracking-tight">Editar Datos del Paciente</h3>
                 <button type="button" onclick="cerrarModal('modal-editar-paciente')" class="text-muted-foreground hover:text-foreground">
@@ -292,21 +299,62 @@
             </div>
             <form th:action="@{/especialista/historias/paciente/guardar}" method="post" class="overflow-y-auto p-5 space-y-4">
                 <input type="hidden" name="codigo" th:value="${resultado.numHc}">
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium">Fecha de nacimiento</label>
+                        <input type="date" name="fechaNacimiento" th:value="${resultado.fechaNacimientoIso}"
+                               class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium">Sexo</label>
+                        <select name="sexo" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                            <option value="">— Seleccionar —</option>
+                            <option value="Masculino" th:selected="${resultado.sexo == 'Masculino'}">Masculino</option>
+                            <option value="Femenino"  th:selected="${resultado.sexo == 'Femenino'}">Femenino</option>
+                            <option value="Otro"      th:selected="${resultado.sexo == 'Otro'}">Otro</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium">Celular</label>
+                        <input type="text" name="celular" th:value="${resultado.celular}"
+                               class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium">Correo</label>
+                        <input type="email" name="correo" th:value="${resultado.correo}"
+                               class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                    </div>
+                </div>
+
                 <div class="space-y-2">
                     <label class="text-sm font-medium">Ocupación</label>
                     <input type="text" name="ocupacion" th:value="${resultado.ocupacion}" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
                 </div>
                 <div class="space-y-2">
                     <label class="text-sm font-medium">Grado de instrucción</label>
-                    <input type="text" name="gradoInstruccion" th:value="${resultado.gradoInstruccion}" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                    <select name="gradoInstruccion" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                        <option value="">— Seleccionar —</option>
+                        <option value="Sin instrucción"         th:selected="${resultado.gradoInstruccion == 'Sin instrucción'}">Sin instrucción</option>
+                        <option value="Primaria"                th:selected="${resultado.gradoInstruccion == 'Primaria'}">Primaria</option>
+                        <option value="Secundaria"              th:selected="${resultado.gradoInstruccion == 'Secundaria'}">Secundaria</option>
+                        <option value="Técnico"                 th:selected="${resultado.gradoInstruccion == 'Técnico'}">Técnico</option>
+                        <option value="Superior universitario"  th:selected="${resultado.gradoInstruccion == 'Superior universitario'}">Superior universitario</option>
+                        <option value="Posgrado"                th:selected="${resultado.gradoInstruccion == 'Posgrado'}">Posgrado</option>
+                    </select>
                 </div>
-                <div class="space-y-2">
-                    <label class="text-sm font-medium">Número de hijos</label>
-                    <input type="number" name="numeroHijos" th:value="${resultado.numeroHijos}" min="0" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
-                </div>
-                <div class="space-y-2">
-                    <label class="text-sm font-medium">Lugar de residencia</label>
-                    <input type="text" name="residencia" th:value="${resultado.residencia}" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium">Número de hijos</label>
+                        <input type="number" name="numeroHijos" th:value="${resultado.numeroHijos}" min="0" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium">Lugar de residencia</label>
+                        <input type="text" name="residencia" th:value="${resultado.residencia}" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                    </div>
                 </div>
                 <button type="submit" class="w-full inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 text-sm font-medium transition-colors">
                     Guardar cambios
@@ -317,7 +365,7 @@
 
     <!-- Modal Editar Anamnesis -->
     <div id="modal-anamnesis" class="fixed inset-0 z-[60] hidden flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-        <div class="bg-card border border-border rounded-xl shadow-xl w-full max-w-2xl overflow-hidden flex flex-col max-h-full">
+        <div class="bg-white border border-border rounded-xl shadow-xl w-full max-w-2xl overflow-hidden flex flex-col max-h-full">
             <div class="p-5 border-b border-border flex items-center justify-between bg-muted/30">
                 <h3 class="font-medium tracking-tight">Editar Anamnesis</h3>
                 <button type="button" onclick="cerrarModal('modal-anamnesis')" class="text-muted-foreground hover:text-foreground">
@@ -353,9 +401,9 @@
         </div>
     </div>
 
-    <!-- Modal Diagnóstico -->
+    <!-- Modal Diagnóstico CIE-11 -->
     <div id="modal-diagnostico" class="fixed inset-0 z-[60] hidden flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-        <div class="bg-card border border-border rounded-xl shadow-xl w-full max-w-md overflow-hidden flex flex-col max-h-full">
+        <div class="bg-white border border-border rounded-xl shadow-xl w-full max-w-md overflow-hidden flex flex-col max-h-full">
             <div class="p-5 border-b border-border flex items-center justify-between bg-muted/30">
                 <h3 class="font-medium tracking-tight">Agregar Diagnóstico</h3>
                 <button type="button" onclick="cerrarModal('modal-diagnostico')" class="text-muted-foreground hover:text-foreground">
@@ -364,16 +412,47 @@
             </div>
             <form th:action="@{/especialista/historias/diagnostico/guardar}" method="post" class="overflow-y-auto p-5 space-y-4">
                 <input type="hidden" name="codigo" th:value="${resultado.numHc}">
-                <div class="space-y-2">
-                    <label class="text-sm font-medium">Código CIE-10 / DSM-5</label>
-                    <input type="text" name="codCie" placeholder="Ej. F41.1" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm font-mono focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" required>
+
+                <!-- Buscador ICD-11 -->
+                <div class="space-y-1.5">
+                    <label class="text-sm font-medium">Buscar diagnóstico CIE-11</label>
+                    <div class="relative">
+                        <input type="text" id="icd-buscar"
+                               placeholder="Escribe el nombre del diagnóstico..."
+                               autocomplete="off"
+                               oninput="onIcdInput(this.value)"
+                               class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 pr-8 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                        <i data-lucide="search" id="icd-icon" class="w-4 h-4 text-muted-foreground absolute right-3 top-3 pointer-events-none"></i>
+                    </div>
+
+                    <!-- Dropdown de resultados -->
+                    <div id="icd-resultados"
+                         class="hidden rounded-md border border-border bg-white shadow-lg overflow-hidden divide-y divide-border max-h-52 overflow-y-auto">
+                    </div>
+                    <p id="icd-sin-resultados" class="hidden text-xs text-muted-foreground px-1">Sin resultados para esa búsqueda.</p>
                 </div>
-                <div class="space-y-2">
-                    <label class="text-sm font-medium">Descripción</label>
-                    <textarea name="descripcion" placeholder="Trastorno de ansiedad..." class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" rows="2" required></textarea>
+
+                <!-- Diagnóstico seleccionado -->
+                <div id="icd-seleccion" class="hidden rounded-lg border border-green-200 bg-green-50 px-3 py-2.5 flex items-start gap-2">
+                    <i data-lucide="check-circle" class="w-4 h-4 text-green-600 mt-0.5 shrink-0"></i>
+                    <div class="min-w-0 flex-1">
+                        <p class="text-xs font-mono font-semibold text-green-700" id="icd-sel-codigo"></p>
+                        <p class="text-sm text-green-800 leading-snug mt-0.5" id="icd-sel-nombre"></p>
+                    </div>
+                    <button type="button" onclick="limpiarIcd()"
+                            class="text-green-600 hover:text-green-900 shrink-0 transition-colors">
+                        <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                    </button>
                 </div>
-                <button type="submit" class="w-full inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 text-sm font-medium transition-colors">
-                    Guardar
+
+                <!-- Campos ocultos enviados al servidor -->
+                <input type="hidden" name="codCie" id="icd-codigo-hidden">
+                <input type="hidden" name="descripcion" id="icd-descripcion-hidden">
+
+                <button type="submit" id="btn-guardar-diag"
+                        disabled
+                        class="w-full inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 text-sm font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+                    Guardar diagnóstico
                 </button>
             </form>
         </div>
@@ -381,7 +460,7 @@
 
     <!-- Modal Visita -->
     <div id="modal-visita" class="fixed inset-0 z-[60] hidden flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-        <div class="bg-card border border-border rounded-xl shadow-xl w-full max-w-md overflow-hidden flex flex-col max-h-full">
+        <div class="bg-white border border-border rounded-xl shadow-xl w-full max-w-md overflow-hidden flex flex-col max-h-full">
             <div class="p-5 border-b border-border flex items-center justify-between bg-muted/30">
                 <h3 class="font-medium tracking-tight">Agregar Visita</h3>
                 <button type="button" onclick="cerrarModal('modal-visita')" class="text-muted-foreground hover:text-foreground">
@@ -417,7 +496,7 @@
 
     <!-- Modal Psicofármaco -->
     <div id="modal-psicofarmaco" class="fixed inset-0 z-[60] hidden flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-        <div class="bg-card border border-border rounded-xl shadow-xl w-full max-w-md overflow-hidden flex flex-col max-h-full">
+        <div class="bg-white border border-border rounded-xl shadow-xl w-full max-w-md overflow-hidden flex flex-col max-h-full">
             <div class="p-5 border-b border-border flex items-center justify-between bg-muted/30">
                 <h3 class="font-medium tracking-tight">Agregar Psicofármaco</h3>
                 <button type="button" onclick="cerrarModal('modal-psicofarmaco')" class="text-muted-foreground hover:text-foreground">
@@ -457,7 +536,7 @@
 
     <!-- Modal Evaluación -->
     <div id="modal-evaluacion" class="fixed inset-0 z-[60] hidden flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-        <div class="bg-card border border-border rounded-xl shadow-xl w-full max-w-md overflow-hidden flex flex-col max-h-full">
+        <div class="bg-white border border-border rounded-xl shadow-xl w-full max-w-md overflow-hidden flex flex-col max-h-full">
             <div class="p-5 border-b border-border flex items-center justify-between bg-muted/30">
                 <h3 class="font-medium tracking-tight">Agregar Evaluación</h3>
                 <button type="button" onclick="cerrarModal('modal-evaluacion')" class="text-muted-foreground hover:text-foreground">
@@ -495,7 +574,12 @@
 <script>
     function abrirModalPaciente() { document.getElementById('modal-editar-paciente').classList.remove('hidden'); }
     function abrirModalAnamnesis() { document.getElementById('modal-anamnesis').classList.remove('hidden'); }
-    function abrirModalDiagnostico() { document.getElementById('modal-diagnostico').classList.remove('hidden'); }
+    function abrirModalDiagnostico() {
+        limpiarIcd();
+        document.getElementById('icd-buscar').value = '';
+        document.getElementById('modal-diagnostico').classList.remove('hidden');
+        setTimeout(() => document.getElementById('icd-buscar').focus(), 50);
+    }
     function abrirModalVisita() { document.getElementById('modal-visita').classList.remove('hidden'); }
     function abrirModalPsicofarmaco() { document.getElementById('modal-psicofarmaco').classList.remove('hidden'); }
     function abrirModalEvaluacion() { document.getElementById('modal-evaluacion').classList.remove('hidden'); }
@@ -537,7 +621,100 @@
         if (e.target === this) cerrarDetalle();
     });
 
-    // Lógica interactiva para cambiar entre las Pestañas (Tabs) del Modal
+    // ── ICD-11 búsqueda en vivo ──────────────────────────────────────────────
+    let icdTimer = null;
+
+    function onIcdInput(valor) {
+        clearTimeout(icdTimer);
+        const trimmed = valor.trim();
+        if (trimmed.length < 3) {
+            ocultarResultadosIcd();
+            return;
+        }
+        setIcdIcon('loader-circle', true);
+        icdTimer = setTimeout(() => buscarIcd(trimmed), 350);
+    }
+
+    async function buscarIcd(texto) {
+        try {
+            const res = await fetch(`/especialista/historias/icd/buscar?q=${encodeURIComponent(texto)}`);
+            const datos = await res.json();
+            renderResultadosIcd(datos);
+        } catch {
+            ocultarResultadosIcd();
+        } finally {
+            setIcdIcon('search', false);
+        }
+    }
+
+    function renderResultadosIcd(datos) {
+        const lista = document.getElementById('icd-resultados');
+        const sinRes = document.getElementById('icd-sin-resultados');
+        lista.innerHTML = '';
+
+        if (!datos || datos.length === 0) {
+            lista.classList.add('hidden');
+            sinRes.classList.remove('hidden');
+            return;
+        }
+
+        sinRes.classList.add('hidden');
+        datos.forEach(item => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'w-full text-left px-3 py-2.5 hover:bg-muted transition-colors flex items-start gap-3';
+            btn.innerHTML = `
+                <span class="font-mono text-xs border border-border px-1.5 py-0.5 rounded bg-muted shrink-0 mt-0.5">${item.codigo}</span>
+                <span class="text-sm text-foreground leading-snug">${item.nombre}</span>`;
+            btn.onclick = () => seleccionarIcd(item.codigo, item.nombre);
+            lista.appendChild(btn);
+        });
+
+        lista.classList.remove('hidden');
+        lucide.createIcons();
+    }
+
+    function seleccionarIcd(codigo, nombre) {
+        document.getElementById('icd-codigo-hidden').value    = codigo;
+        document.getElementById('icd-descripcion-hidden').value = nombre;
+        document.getElementById('icd-sel-codigo').textContent = codigo;
+        document.getElementById('icd-sel-nombre').textContent  = nombre;
+        document.getElementById('icd-seleccion').classList.remove('hidden');
+        document.getElementById('icd-buscar').value = '';
+        ocultarResultadosIcd();
+        document.getElementById('btn-guardar-diag').disabled = false;
+        lucide.createIcons();
+    }
+
+    function limpiarIcd() {
+        document.getElementById('icd-codigo-hidden').value    = '';
+        document.getElementById('icd-descripcion-hidden').value = '';
+        document.getElementById('icd-seleccion').classList.add('hidden');
+        document.getElementById('btn-guardar-diag').disabled = true;
+        ocultarResultadosIcd();
+    }
+
+    function ocultarResultadosIcd() {
+        document.getElementById('icd-resultados').classList.add('hidden');
+        document.getElementById('icd-sin-resultados').classList.add('hidden');
+    }
+
+    function setIcdIcon(nombre, spin) {
+        const el = document.getElementById('icd-icon');
+        el.setAttribute('data-lucide', nombre);
+        spin ? el.classList.add('animate-spin') : el.classList.remove('animate-spin');
+        lucide.createIcons();
+    }
+
+    // Cerrar dropdown al hacer clic fuera
+    document.addEventListener('click', function(e) {
+        if (!document.getElementById('icd-buscar').contains(e.target) &&
+            !document.getElementById('icd-resultados').contains(e.target)) {
+            ocultarResultadosIcd();
+        }
+    });
+
+    // ── Lógica interactiva para cambiar entre las Pestañas (Tabs) del Modal
     function cambiarPestaña(pestañaId) {
         // Ocultar todos los contenidos de las pestañas
         const contenidos = document.querySelectorAll('.tab-content');

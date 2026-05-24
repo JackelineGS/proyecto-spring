@@ -108,8 +108,17 @@
                             </div>
                             <div class="form-group">
                                 <label for="dni">DNI</label>
-                                <input id="dni" name="dni" class="form-control" maxlength="8" inputmode="numeric"
-                                       pattern="[0-9]{8}" title="8 dígitos" required>
+                                <div style="display:flex;gap:.5rem;">
+                                    <input id="dni" name="dni" class="form-control" maxlength="8" inputmode="numeric"
+                                           pattern="[0-9]{8}" title="8 dígitos" required
+                                           oninput="this.value=this.value.replace(/\D/g,''); if(this.value.length===8) consultarDniReserva()">
+                                    <button type="button" onclick="consultarDniReserva()"
+                                            id="btn-dni-reserva"
+                                            style="white-space:nowrap;padding:0 .75rem;border:1px solid var(--border);border-radius:.5rem;background:var(--card);font-size:.85rem;cursor:pointer;">
+                                        Consultar
+                                    </button>
+                                </div>
+                                <div id="dni-reserva-status" style="display:none;font-size:.8rem;margin-top:.3rem;"></div>
                             </div>
                         </div>
                     </section>
@@ -207,5 +216,44 @@
 
 <div th:replace="~{fragments/layout :: footer}"></div>
 <div th:replace="~{fragments/layout :: scripts}"></div>
+
+<script>
+async function consultarDniReserva() {
+    const dni = document.getElementById('dni').value.trim();
+    const statusEl = document.getElementById('dni-reserva-status');
+    const btn = document.getElementById('btn-dni-reserva');
+    if (dni.length !== 8) return;
+
+    btn.disabled = true;
+    btn.textContent = 'Consultando...';
+    statusEl.style.display = 'none';
+
+    try {
+        const res = await fetch(`/api/dni?numero=${dni}`);
+        const data = await res.json();
+
+        if (!res.ok || data.error) {
+            statusEl.style.color = '#dc2626';
+            statusEl.textContent = data.error || 'No se encontraron datos para ese DNI.';
+            statusEl.style.display = 'block';
+        } else {
+            if (data.nombres)          document.getElementById('nombre').value          = data.nombres;
+            if (data.apellidos)        document.getElementById('apellido').value        = data.apellidos;
+            if (data.fechaNacimiento)  document.getElementById('fechaNacimiento').value = data.fechaNacimiento;
+
+            statusEl.style.color = '#16a34a';
+            statusEl.textContent = `✓ Datos de ${data.nombres} ${data.apellidos} cargados desde RENIEC.`;
+            statusEl.style.display = 'block';
+        }
+    } catch {
+        statusEl.style.color = '#dc2626';
+        statusEl.textContent = 'Error de conexión al consultar el DNI.';
+        statusEl.style.display = 'block';
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Consultar';
+    }
+}
+</script>
 </body>
 </html>

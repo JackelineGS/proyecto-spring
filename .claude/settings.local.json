@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\johan\\\\OneDrive\\\\Documentos\\\\GitHub\\\\proyecto-spring\\\\src\\\\main\\\\resources\\\\templates\" -Recurse -File)",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(Sort-Object)",
+      "Bash(psql \"postgresql://neondb_owner:npg_jhY4duGM0HkE@ep-wandering-cell-ape668pn-pooler.c-7.us-east-1.aws.neon.tech/neondb?sslmode=require\" -c \"CREATE TABLE IF NOT EXISTS pagos \\(id_pago SERIAL PRIMARY KEY, id_paciente BIGINT NOT NULL REFERENCES paciente\\(id_paciente\\), id_paquete BIGINT REFERENCES paquete\\(id_paquete\\), fecha DATE NOT NULL DEFAULT CURRENT_DATE, monto NUMERIC\\(10, 2\\), metodo_pago VARCHAR\\(20\\), numero_comprobante VARCHAR\\(20\\), tipo_comprobante VARCHAR\\(10\\) NOT NULL DEFAULT 'boleta'\\);\")"
+    ]
+  }
+}

@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Nueva Historia Clínica')}"></head>
+<body class="bg-background text-foreground min-h-screen flex flex-col">
+
+<div th:replace="~{fragments/especialista-layout :: header}"></div>
+
+<div class="flex-1 max-w-7xl w-full mx-auto px-6 py-8 grid grid-cols-[220px_1fr] gap-8">
+    <div th:replace="~{fragments/especialista-layout :: sidebar('historias')}"></div>
+
+    <section class="min-w-0">
+        <div class="space-y-6 max-w-2xl">
+
+            <!-- Page header -->
+            <div class="flex items-center gap-3">
+                <a th:href="@{/especialista/historias}"
+                   class="inline-flex items-center justify-center rounded-md border border-input bg-background hover:bg-accent h-8 w-8 text-muted-foreground hover:text-foreground transition-colors">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                </a>
+                <h1 class="tracking-tight text-2xl font-medium">Nueva historia clínica</h1>
+            </div>
+
+            <!-- Flash messages -->
+            <div th:if="${error}"
+                 class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 flex items-center gap-2">
+                <i data-lucide="circle-alert" class="w-4 h-4 shrink-0"></i>
+                <span th:text="${error}"></span>
+            </div>
+
+            <form th:action="@{/especialista/historias/registrar}" method="post" class="space-y-5">
+
+                <!-- ── Sección 1: Identificación ─────────────────────────────── -->
+                <div class="rounded-2xl border border-border bg-card p-6 space-y-4">
+                    <h2 class="text-base font-medium tracking-tight">Identificación del paciente</h2>
+
+                    <div class="space-y-2">
+                        <label for="numDocumento" class="text-sm font-medium leading-none">Número de DNI</label>
+                        <div class="flex gap-2">
+                            <input id="numDocumento" name="numDocumento" type="text"
+                                   maxlength="8" inputmode="numeric"
+                                   placeholder="Ej. 72839102"
+                                   oninput="this.value=this.value.replace(/\D/g,''); if(this.value.length===8) consultarDni()"
+                                   class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm font-mono placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                                   required>
+                            <button type="button" onclick="consultarDni()"
+                                    id="btn-consultar"
+                                    class="inline-flex items-center gap-2 rounded-md border border-input bg-background hover:bg-accent h-10 px-3 text-sm font-medium transition-colors whitespace-nowrap">
+                                <i data-lucide="search" class="w-4 h-4"></i>
+                                Consultar
+                            </button>
+                        </div>
+
+                        <!-- DNI status message -->
+                        <div id="dni-status" class="hidden text-sm flex items-center gap-1.5"></div>
+                    </div>
+                </div>
+
+                <!-- ── Sección 2: Datos del paciente ─────────────────────────── -->
+                <div class="rounded-2xl border border-border bg-card p-6 space-y-4">
+                    <div class="flex items-center justify-between gap-3">
+                        <h2 class="text-base font-medium tracking-tight">Datos del paciente</h2>
+                        <span id="badge-autorel" class="hidden inline-flex items-center gap-1 rounded-full bg-green-100 text-green-700 border border-green-200 px-2 py-0.5 text-xs font-medium">
+                            <i data-lucide="check" class="w-3 h-3"></i> Datos desde RENIEC
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-2">
+                            <label for="nombre" class="text-sm font-medium leading-none">Nombres</label>
+                            <input id="nombre" name="nombre" type="text"
+                                   placeholder="Nombres del paciente"
+                                   class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                                   required>
+                        </div>
+                        <div class="space-y-2">
+                            <label for="apellido" class="text-sm font-medium leading-none">Apellidos</label>
+                            <input id="apellido" name="apellido" type="text"
+                                   placeholder="Apellidos del paciente"
+                                   class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                                   required>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-2">
+                            <label for="fechaNacimiento" class="text-sm font-medium leading-none">Fecha de nacimiento</label>
+                            <input id="fechaNacimiento" name="fechaNacimiento" type="date"
+                                   class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                        </div>
+                        <div class="space-y-2">
+                            <label for="sexo" class="text-sm font-medium leading-none">Sexo</label>
+                            <select id="sexo" name="sexo"
+                                    class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                                <option value="">— Seleccionar —</option>
+                                <option value="Masculino">Masculino</option>
+                                <option value="Femenino">Femenino</option>
+                                <option value="Otro">Otro</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label for="residencia" class="text-sm font-medium leading-none">Lugar de residencia</label>
+                        <input id="residencia" name="residencia" type="text"
+                               placeholder="Dirección, distrito, provincia"
+                               class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-2">
+                            <label for="celular" class="text-sm font-medium leading-none">Celular</label>
+                            <input id="celular" name="celular" type="tel"
+                                   placeholder="9XXXXXXXX"
+                                   class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                        </div>
+                        <div class="space-y-2">
+                            <label for="correo" class="text-sm font-medium leading-none">Correo electrónico</label>
+                            <input id="correo" name="correo" type="email"
+                                   placeholder="paciente@correo.com"
+                                   class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-2">
+                            <label for="gradoInstruccion" class="text-sm font-medium leading-none">Grado de instrucción</label>
+                            <select id="gradoInstruccion" name="gradoInstruccion"
+                                    class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                                <option value="">— Seleccionar —</option>
+                                <option value="Sin instrucción">Sin instrucción</option>
+                                <option value="Primaria">Primaria</option>
+                                <option value="Secundaria">Secundaria</option>
+                                <option value="Técnico">Técnico</option>
+                                <option value="Superior universitario">Superior universitario</option>
+                                <option value="Posgrado">Posgrado</option>
+                            </select>
+                        </div>
+                        <div class="space-y-2">
+                            <label for="ocupacion" class="text-sm font-medium leading-none">Ocupación</label>
+                            <input id="ocupacion" name="ocupacion" type="text"
+                                   placeholder="Ej. Docente"
+                                   class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                        </div>
+                    </div>
+
+                    <div class="w-28 space-y-2">
+                        <label for="numHijos" class="text-sm font-medium leading-none">N° hijos</label>
+                        <input id="numHijos" name="numHijos" type="number"
+                               min="0" value="0"
+                               class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                    </div>
+                </div>
+
+                <!-- ── Sección 3: Historia clínica ─────────────────────────── -->
+                <div class="rounded-2xl border border-border bg-card p-6 space-y-4">
+                    <h2 class="text-base font-medium tracking-tight">Historia clínica</h2>
+
+                    <div class="space-y-2">
+                        <label for="motivoConsulta" class="text-sm font-medium leading-none">Motivo de consulta</label>
+                        <textarea id="motivoConsulta" name="motivoConsulta" rows="4"
+                                  placeholder="Describe el motivo principal de la consulta..."
+                                  class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-none"
+                                  required></textarea>
+                    </div>
+                </div>
+
+                <!-- ── Acciones ─────────────────────────────────────────────── -->
+                <div class="flex items-center justify-end gap-3 pb-4">
+                    <a th:href="@{/especialista/historias}"
+                       class="inline-flex items-center justify-center rounded-md border border-input bg-background hover:bg-accent h-10 px-4 text-sm font-medium transition-colors">
+                        Cancelar
+                    </a>
+                    <button type="submit"
+                            class="inline-flex items-center gap-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-5 text-sm font-medium transition-colors">
+                        <i data-lucide="file-plus" class="w-4 h-4"></i>
+                        Crear historia clínica
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </section>
+</div>
+
+<script>
+    lucide.createIcons();
+
+    async function consultarDni() {
+        const dni = document.getElementById('numDocumento').value.trim();
+        const statusEl = document.getElementById('dni-status');
+        const badge = document.getElementById('badge-autorel');
+        const btn = document.getElementById('btn-consultar');
+
+        if (dni.length !== 8) {
+            mostrarStatus('error', 'Ingresa los 8 dígitos del DNI.');
+            return;
+        }
+
+        // Loading state
+        btn.disabled = true;
+        btn.innerHTML = '<i data-lucide="loader-circle" class="w-4 h-4 animate-spin"></i> Consultando...';
+        lucide.createIcons();
+        mostrarStatus('info', 'Consultando RENIEC...');
+        badge.classList.add('hidden');
+
+        try {
+            const res = await fetch(`/especialista/historias/dni/consultar?numero=${dni}`);
+            const data = await res.json();
+
+            if (!res.ok || data.error) {
+                mostrarStatus('error', data.error || 'No se encontraron datos para ese DNI.');
+                limpiarCamposDni();
+            } else {
+                document.getElementById('nombre').value         = data.nombres          || '';
+                document.getElementById('apellido').value       = data.apellidos         || '';
+                document.getElementById('residencia').value     = data.residencia        || '';
+                document.getElementById('fechaNacimiento').value = data.fechaNacimiento  || '';
+
+                const sexoSelect = document.getElementById('sexo');
+                if (data.sexo) {
+                    for (let opt of sexoSelect.options) {
+                        if (opt.value === data.sexo) { sexoSelect.value = data.sexo; break; }
+                    }
+                }
+
+                mostrarStatus('ok', `Datos de ${data.nombres} ${data.apellidos} cargados desde RENIEC.`);
+                badge.classList.remove('hidden');
+                lucide.createIcons();
+            }
+        } catch {
+            mostrarStatus('error', 'Error de conexión al consultar el DNI.');
+            limpiarCamposDni();
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i data-lucide="search" class="w-4 h-4"></i> Consultar';
+            lucide.createIcons();
+        }
+    }
+
+    function limpiarCamposDni() {
+        document.getElementById('nombre').value          = '';
+        document.getElementById('apellido').value        = '';
+        document.getElementById('residencia').value      = '';
+        document.getElementById('fechaNacimiento').value = '';
+        document.getElementById('sexo').value            = '';
+        document.getElementById('badge-autorel').classList.add('hidden');
+    }
+
+    function mostrarStatus(tipo, mensaje) {
+        const el = document.getElementById('dni-status');
+        const colores = {
+            ok:    'text-green-700',
+            error: 'text-red-600',
+            info:  'text-muted-foreground'
+        };
+        const iconos = {
+            ok:    'check-circle',
+            error: 'circle-x',
+            info:  'loader-circle'
+        };
+        el.className = `flex items-center gap-1.5 text-sm ${colores[tipo] || ''}`;
+        el.innerHTML = `<i data-lucide="${iconos[tipo]}" class="w-4 h-4 shrink-0"></i> ${mensaje}`;
+        el.classList.remove('hidden');
+        lucide.createIcons();
+    }
+</script>
+</body>
+</html>

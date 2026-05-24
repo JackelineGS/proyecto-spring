@@ -101,7 +101,7 @@
 
     <!-- Modal crear / editar -->
     <div id="modal-empleado" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-        <div class="bg-card border border-border rounded-2xl shadow-xl w-full max-w-md p-6">
+        <div class="bg-white border border-border rounded-2xl shadow-xl w-full max-w-md p-6">
             <div class="flex items-center justify-between mb-5">
                 <h2 id="modal-empleado-titulo" class="text-lg font-medium tracking-tight">Nuevo empleado</h2>
                 <button type="button" onclick="cerrarModalEmpleado()" class="text-muted-foreground hover:text-foreground p-1 rounded-md hover:bg-accent">
@@ -155,6 +155,16 @@
                     </select>
                 </div>
                 
+                <div class="space-y-2">
+                    <label for="empleado-contrasenia" class="text-sm font-medium">
+                        Contraseña <span id="label-contrasenia-req" class="text-red-500">*</span>
+                        <span id="label-contrasenia-opt" class="hidden text-muted-foreground font-normal text-xs">(dejar vacío para no cambiar)</span>
+                    </label>
+                    <input id="empleado-contrasenia" name="contrasenia" type="password" maxlength="50"
+                           autocomplete="new-password"
+                           class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                </div>
+
                 <div class="space-y-2 flex items-center gap-2 mt-4">
                     <input type="checkbox" id="empleado-estado" name="estado" value="true" class="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary">
                     <label for="empleado-estado" class="text-sm font-medium mb-0">Empleado Activo</label>
@@ -187,6 +197,9 @@
         var inputRol = document.getElementById('empleado-rol');
         var inputEspecialidad = document.getElementById('empleado-especialidad');
         var inputEstado = document.getElementById('empleado-estado');
+        var inputContrasenia = document.getElementById('empleado-contrasenia');
+        var labelReq = document.getElementById('label-contrasenia-req');
+        var labelOpt = document.getElementById('label-contrasenia-opt');
 
         function abrirModalEmpleado() {
             tituloEmpleado.textContent = 'Nuevo empleado';
@@ -198,6 +211,10 @@
             inputRol.value = '';
             inputEspecialidad.value = '';
             inputEstado.checked = true;
+            inputContrasenia.value = '';
+            inputContrasenia.required = true;
+            labelReq.classList.remove('hidden');
+            labelOpt.classList.add('hidden');
             mostrarModal();
         }
 
@@ -211,6 +228,10 @@
             inputRol.value = btn.dataset.rol || '';
             inputEspecialidad.value = btn.dataset.especialidadid || '';
             inputEstado.checked = btn.dataset.estado === 'true';
+            inputContrasenia.value = '';
+            inputContrasenia.required = false;
+            labelReq.classList.add('hidden');
+            labelOpt.classList.remove('hidden');
             mostrarModal();
         }
 

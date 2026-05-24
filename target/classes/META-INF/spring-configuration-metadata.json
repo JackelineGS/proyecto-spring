@@ -1,0 +1,50 @@
+{
+  "groups": [
+    {
+      "name": "dni.api",
+      "type": "com.springboot.proyectospring.config.DniProperties",
+      "sourceType": "com.springboot.proyectospring.config.DniProperties"
+    },
+    {
+      "name": "icd.api",
+      "type": "com.springboot.proyectospring.config.IcdProperties",
+      "sourceType": "com.springboot.proyectospring.config.IcdProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "dni.api.token",
+      "type": "java.lang.String",
+      "sourceType": "com.springboot.proyectospring.config.DniProperties"
+    },
+    {
+      "name": "dni.api.url",
+      "type": "java.lang.String",
+      "sourceType": "com.springboot.proyectospring.config.DniProperties"
+    },
+    {
+      "name": "icd.api.base-url",
+      "type": "java.lang.String",
+      "sourceType": "com.springboot.proyectospring.config.IcdProperties"
+    },
+    {
+      "name": "icd.api.client-id",
+      "type": "java.lang.String",
+      "sourceType": "com.springboot.proyectospring.config.IcdProperties"
+    },
+    {
+      "name": "icd.api.client-secret",
+      "type": "java.lang.String",
+      "sourceType": "com.springboot.proyectospring.config.IcdProperties"
+    },
+    {
+      "name": "icd.api.token-url",
+      "type": "java.lang.String",
+      "sourceType": "com.springboot.proyectospring.config.IcdProperties"
+    }
+  ],
+  "hints": [],
+  "ignored": {
+    "properties": []
+  }
+}
