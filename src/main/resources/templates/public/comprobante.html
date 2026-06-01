@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pago.tipoComprobante == 'factura' ? 'Factura' : 'Boleta'} + ' ' + ${pago.numeroComprobante}">Comprobante</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 14px; color: #1a1a1a; background: #f5f5f5; }
+
+        .page { max-width: 720px; margin: 2rem auto; background: #fff; border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,.1); overflow: hidden; }
+
+        .header { display: flex; justify-content: space-between; align-items: flex-start; padding: 2rem 2.5rem; background: #1e3a5f; color: #fff; }
+        .clinic-name { font-size: 1.6rem; font-weight: 700; letter-spacing: -.5px; }
+        .clinic-sub { font-size: .85rem; opacity: .8; margin-top: .25rem; }
+        .clinic-ruc { font-size: .8rem; opacity: .7; margin-top: .5rem; }
+        .doc-box { text-align: right; }
+        .doc-tipo { font-size: .75rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; opacity: .8; }
+        .doc-numero { font-size: 1.4rem; font-weight: 700; margin: .25rem 0; }
+        .doc-fecha { font-size: .8rem; opacity: .75; }
+
+        .body { padding: 2rem 2.5rem; }
+
+        .section { margin-bottom: 1.5rem; }
+        .section-title { font-size: .7rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #6b7280; border-bottom: 1px solid #e5e7eb; padding-bottom: .5rem; margin-bottom: .75rem; }
+
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .35rem 1.5rem; }
+        .info-row { display: flex; flex-direction: column; }
+        .info-label { font-size: .7rem; color: #9ca3af; }
+        .info-val { font-size: .9rem; font-weight: 500; }
+
+        table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+        thead tr { background: #f9fafb; }
+        th { padding: .6rem .75rem; text-align: left; font-size: .75rem; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; color: #6b7280; }
+        td { padding: .75rem .75rem; border-bottom: 1px solid #f3f4f6; font-size: .9rem; }
+        th:last-child, td:last-child { text-align: right; }
+        th:nth-child(2), td:nth-child(2) { text-align: center; }
+        .item-desc { font-weight: 500; }
+        .item-sub { font-size: .78rem; color: #6b7280; margin-top: .15rem; }
+
+        .totals { display: flex; flex-direction: column; align-items: flex-end; gap: .35rem; padding: 1rem 0; border-top: 2px solid #1e3a5f; }
+        .total-row { display: flex; gap: 3rem; font-size: .9rem; color: #4b5563; }
+        .total-row.final { font-size: 1.15rem; font-weight: 700; color: #1e3a5f; }
+        .total-label { min-width: 120px; text-align: right; }
+        .total-val { min-width: 80px; text-align: right; }
+
+        .badge { display: inline-block; padding: .25rem .75rem; border-radius: 999px; font-size: .78rem; font-weight: 600; background: #eff6ff; color: #1d4ed8; }
+
+        .footer { padding: 1.5rem 2.5rem; background: #f9fafb; border-top: 1px solid #e5e7eb; text-align: center; color: #6b7280; font-size: .82rem; line-height: 1.6; }
+
+        .actions { padding: 1.5rem 2.5rem; display: flex; gap: 1rem; justify-content: center; background: #fff; }
+        .btn { display: inline-flex; align-items: center; gap: .4rem; padding: .6rem 1.4rem; border-radius: 8px; font-size: .9rem; font-weight: 500; cursor: pointer; border: none; text-decoration: none; }
+        .btn-primary { background: #1e3a5f; color: #fff; }
+        .btn-outline { background: transparent; border: 1px solid #d1d5db; color: #374151; }
+
+        @media print {
+            body { background: #fff; font-size: 12px; }
+            .page { box-shadow: none; border-radius: 0; margin: 0; max-width: 100%; }
+            .actions { display: none; }
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+
+    <!-- Encabezado -->
+    <div class="header">
+        <div>
+            <div class="clinic-name">Digital Health</div>
+            <div class="clinic-sub">Psicología y Salud Mental</div>
+            <div class="clinic-ruc">RUC: 20123456789</div>
+        </div>
+        <div class="doc-box">
+            <div class="doc-tipo"
+                 th:text="${pago.tipoComprobante == 'factura' ? 'Factura Electrónica' : 'Boleta de Venta'}">
+                Boleta de Venta
+            </div>
+            <div class="doc-numero" th:text="${pago.numeroComprobante}">B-2025-00001</div>
+            <div class="doc-fecha"
+                 th:text="'Fecha: ' + ${#temporals.format(pago.fecha, 'd/MM/yyyy')}">Fecha</div>
+        </div>
+    </div>
+
+    <div class="body">
+
+        <!-- Datos del cliente -->
+        <div class="section">
+            <div class="section-title">Datos del Cliente</div>
+            <div class="info-grid">
+                <div class="info-row">
+                    <span class="info-label"
+                          th:text="${pago.tipoComprobante == 'factura' ? 'RUC' : 'DNI'}">DNI</span>
+                    <span class="info-val"
+                          th:text="${pago.paciente.numDocumento}">—</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Cliente</span>
+                    <span class="info-val" th:text="${pago.paciente.nombreCompleto}">—</span>
+                </div>
+                <div class="info-row" th:if="${pago.paciente.correo}">
+                    <span class="info-label">Correo</span>
+                    <span class="info-val" th:text="${pago.paciente.correo}">—</span>
+                </div>
+                <div class="info-row" th:if="${pago.paciente.celular}">
+                    <span class="info-label">Celular</span>
+                    <span class="info-val" th:text="${pago.paciente.celular}">—</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detalle del servicio -->
+        <div class="section">
+            <div class="section-title">Detalle del Servicio</div>
+            <table>
+                <thead>
+                <tr>
+                    <th>Descripción</th>
+                    <th>Sesiones</th>
+                    <th>Total</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>
+                        <div class="item-desc" th:text="${pago.paquete.nombre}">Paquete</div>
+                        <div class="item-sub"
+                             th:if="${pago.paquete.descripcion}"
+                             th:text="${pago.paquete.descripcion}">Descripción</div>
+                    </td>
+                    <td th:text="${pago.paquete.totalSesiones}">1</td>
+                    <td th:text="'S/ ' + ${#numbers.formatDecimal(pago.monto, 1, 2)}">S/ 0.00</td>
+                </tr>
+                </tbody>
+            </table>
+
+            <!-- Factura: muestra IGV desglosado -->
+            <div class="totals" th:if="${pago.tipoComprobante == 'factura'}">
+                <div class="total-row">
+                    <span class="total-label">Subtotal (sin IGV)</span>
+                    <span class="total-val"
+                          th:text="'S/ ' + ${#numbers.formatDecimal(baseImponible, 1, 2)}">S/ 0.00</span>
+                </div>
+                <div class="total-row">
+                    <span class="total-label">IGV (18%)</span>
+                    <span class="total-val"
+                          th:text="'S/ ' + ${#numbers.formatDecimal(igv, 1, 2)}">S/ 0.00</span>
+                </div>
+                <div class="total-row final">
+                    <span class="total-label">Total</span>
+                    <span class="total-val"
+                          th:text="'S/ ' + ${#numbers.formatDecimal(pago.monto, 1, 2)}">S/ 0.00</span>
+                </div>
+            </div>
+            <!-- Boleta: solo total -->
+            <div class="totals" th:if="${pago.tipoComprobante != 'factura'}">
+                <div class="total-row final">
+                    <span class="total-label">Total</span>
+                    <span class="total-val"
+                          th:text="'S/ ' + ${#numbers.formatDecimal(pago.monto, 1, 2)}">S/ 0.00</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pago -->
+        <div class="section">
+            <div class="section-title">Información de Pago</div>
+            <div class="info-grid">
+                <div class="info-row">
+                    <span class="info-label">Método de pago</span>
+                    <span class="badge" th:text="${pago.metodoPago ?: '—'}">—</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Fecha de pago</span>
+                    <span class="info-val"
+                          th:text="${#temporals.format(pago.fecha, 'd/MM/yyyy')}">—</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="footer">
+        Gracias por confiar en <strong>Digital Health</strong>. Este documento es válido como constancia de pago.<br>
+        Consultas: <strong>+51 923 826 177</strong> &nbsp;·&nbsp; <strong>contacto@digitalhealth.pe</strong>
+    </div>
+
+    <div class="actions">
+        <button class="btn btn-primary" onclick="window.print()">&#128438; Imprimir / Guardar PDF</button>
+        <a th:href="@{/}" class="btn btn-outline">&#8592; Volver al inicio</a>
+    </div>
+
+</div>
+</body>
+</html>

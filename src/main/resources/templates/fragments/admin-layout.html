@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- HEADER FRAGMENT -->
+<header th:fragment="header" class="border-b border-border bg-background/80 backdrop-blur-sm">
+    <div class="max-w-[1400px] mx-auto px-6 py-4 flex items-center justify-between">
+        <a th:href="@{/}" class="flex items-center gap-2">
+            <div class="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+                <i data-lucide="shield" class="w-5 h-5"></i>
+            </div>
+            <span class="tracking-tight">Digital Health &middot; Administración</span>
+        </a>
+        <a th:href="@{/login}" class="flex items-center gap-2 text-muted-foreground hover:text-foreground transition">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+            Cerrar sesión
+        </a>
+    </div>
+</header>
+
+<!-- SIDEBAR FRAGMENT -->
+<aside th:fragment="sidebar(activeMenu)" class="space-y-1">
+    <a th:href="@{/admin/empleados}"
+       th:classappend="${activeMenu == 'empleados' ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}"
+       class="flex items-center gap-3 rounded-xl px-4 py-3 transition">
+        <i data-lucide="users" class="w-4 h-4"></i>
+        Empleados
+    </a>
+    <a th:href="@{/admin/servicios}"
+       th:classappend="${activeMenu == 'servicios' ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}"
+       class="flex items-center gap-3 rounded-xl px-4 py-3 transition">
+        <i data-lucide="briefcase" class="w-4 h-4"></i>
+        Servicios
+    </a>
+    <a th:href="@{/admin/paquetes}"
+       th:classappend="${activeMenu == 'paquetes' ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}"
+       class="flex items-center gap-3 rounded-xl px-4 py-3 transition">
+        <i data-lucide="package" class="w-4 h-4"></i>
+        Paquetes
+    </a>
+</aside>
+
+</body>
+</html>
