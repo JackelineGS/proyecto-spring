@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Horarios - Especialista')}"></head>
+<body class="bg-background text-foreground min-h-screen flex flex-col">
+
+<style>
+    .slot-btn .icon-x { display: none; }
+    .slot-btn .icon-plus { display: inline-block; }
+
+    .slot-btn.is-active .icon-x { display: inline-block; }
+    .slot-btn.is-active .icon-plus { display: none; }
+</style>
+
+<div th:replace="~{fragments/especialista-layout :: header}"></div>
+
+<div class="flex-1 max-w-7xl w-full mx-auto px-6 py-8 grid grid-cols-[220px_1fr] gap-8">
+    <div th:replace="~{fragments/especialista-layout :: sidebar('horarios')}"></div>
+
+    <section class="min-w-0">
+        <div class="space-y-6">
+            <div>
+                <h1 class="tracking-tight text-2xl font-medium">Mis horarios</h1>
+                <p class="text-muted-foreground">Selecciona los intervalos en los que estás disponible para tomar citas.</p>
+            </div>
+
+            <div class="space-y-4">
+                <div th:each="entrada : ${horariosIniciales}" class="day-card rounded-2xl border border-border bg-card p-5" th:data-dia="${entrada.key}">
+                    <div class="flex items-center justify-between mb-3 gap-3">
+                        <h3 class="tracking-tight font-medium" th:text="${entrada.key}">Día</h3>
+                        <div class="flex items-center gap-3">
+                                <span class="slot-counter text-muted-foreground text-sm"
+                                      th:text="${#lists.size(entrada.value)} + ' slot' + (${#lists.size(entrada.value)} == 1 ? '' : 's')">
+                                    0 slots
+                                </span>
+                            <button type="button"
+                                    onclick="marcarTodos(this)"
+                                    class="inline-flex items-center justify-center rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3 text-sm font-medium transition-colors">
+                                Marcar todos
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <button th:each="slot : ${slots}"
+                                type="button"
+                                th:data-time="${slot}"
+                                th:classappend="${entrada.value.contains(slot)} ? 'border-primary bg-primary text-primary-foreground is-active' : 'border-border hover:border-primary/50'"
+                                class="slot-btn px-3 py-1.5 rounded-lg border transition flex items-center gap-1.5 text-sm"
+                                onclick="toggleSlot(this)">
+                            <i data-lucide="plus" class="icon-plus w-3 h-3"></i>
+                            <i data-lucide="x" class="icon-x w-3 h-3"></i>
+                            <span th:text="${slot}">10:00</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-end">
+                <button type="button" onclick="guardarCambios()"
+                        class="inline-flex items-center justify-center rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 transition-colors">
+                    Guardar cambios
+                </button>
+            </div>
+        </div>
+    </section>
+</div>
+
+<script>
+    // Inicializar iconos de Lucide al cargar la página por primera vez
+    lucide.createIcons();
+
+    // Alternar el estado (Activo/Inactivo) de un botón de horario individual
+    function toggleSlot(btn) {
+        const isActive = btn.classList.contains('is-active');
+        if (isActive) {
+            btn.classList.remove('border-primary', 'bg-primary', 'text-primary-foreground', 'is-active');
+            btn.classList.add('border-border');
+        } else {
+            btn.classList.add('border-primary', 'bg-primary', 'text-primary-foreground', 'is-active');
+            btn.classList.remove('border-border');
+        }
+        actualizarContadorDia(btn.closest('.day-card'));
+    }
+
+    // Actualizar el texto del contador superior en tiempo real (ej: "3 slots")
+    function actualizarContadorDia(card) {
+        const activos = card.querySelectorAll('.slot-btn.is-active').length;
+        const counterSpan = card.querySelector('.slot-counter');
+        counterSpan.textContent = `${activos} slot${activos === 1 ? '' : 's'}`;
+    }
+
+    // Lógica de "Marcar todos / Desmarcar todos" por día
+    function marcarTodos(buttonElement) {
+        const card = buttonElement.closest('.day-card');
+        const totalButtons = card.querySelectorAll('.slot-btn');
+        const activeButtons = card.querySelectorAll('.slot-btn.is-active');
+
+        // Si hay slots libres, los marcamos todos. Si ya están todos llenos, los limpiamos.
+        const marcar = activeButtons.length < totalButtons.length;
+
+        totalButtons.forEach(btn => {
+            const isActive = btn.classList.contains('is-active');
+            if (marcar && !isActive) {
+                btn.classList.add('border-primary', 'bg-primary', 'text-primary-foreground', 'is-active');
+                btn.classList.remove('border-border');
+            } else if (!marcar && isActive) {
+                btn.classList.remove('border-primary', 'bg-primary', 'text-primary-foreground', 'is-active');
+                btn.classList.add('border-border');
+            }
+        });
+
+        actualizarContadorDia(card);
+    }
+
+    // Mapear los elementos activos y enviarlos mediante un POST JSON a Java
+    function guardarCambios() {
+        const payload = {};
+
+        document.querySelectorAll('.day-card').forEach(card => {
+            const dia = card.getAttribute('data-dia');
+            payload[dia] = [];
+
+            card.querySelectorAll('.slot-btn.is-active').forEach(btn => {
+                const hora = btn.getAttribute('data-time');
+                payload[dia].push(hora);
+            });
+        });
+
+        fetch('/api/horarios/guardar', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        })
+        .then(response => {
+            if (response.ok) {
+                alert('¡Horarios guardados exitosamente!');
+            } else {
+                alert('Error en el servidor al intentar guardar los horarios.');
+            }
+        })
+        .catch(error => {
+            console.error('Error en la petición:', error);
+            alert('No se pudo establecer conexión con el servidor.');
+        });
+    }
+</script>
+</body>
+</html>
