@@ -13,13 +13,13 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <h1 class="tracking-tight text-2xl font-medium">Citas</h1>
-                        <p class="text-muted-foreground" th:text="'Semana ' + (${semana} >= 0 ? '+' + ${semana} : ${semana})">Semana actual</p>
+                        <p class="text-muted-foreground" th:text="'Semana ' + ${numeroSemana} + ', ' + ${anioSemana}">Semana actual</p>
                     </div>
                     <div class="flex items-center gap-2">
-                        <a th:href="@{/especialista/citas(semana=${semana - 1})}" class="inline-flex items-center justify-center rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 w-10 transition-colors">
+                        <a th:href="@{/especialista/citas(anio=${prevAnio}, numeroSemana=${prevSemana})}" class="inline-flex items-center justify-center rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 w-10 transition-colors">
                             <i data-lucide="chevron-left" class="w-4 h-4"></i>
                         </a>
-                        <a th:href="@{/especialista/citas(semana=${semana + 1})}" class="inline-flex items-center justify-center rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 w-10 transition-colors">
+                        <a th:href="@{/especialista/citas(anio=${nextAnio}, numeroSemana=${nextSemana})}" class="inline-flex items-center justify-center rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 w-10 transition-colors">
                             <i data-lucide="chevron-right" class="w-4 h-4"></i>
                         </a>
                     </div>

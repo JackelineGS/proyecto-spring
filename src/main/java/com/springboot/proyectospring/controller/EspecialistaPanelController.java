@@ -44,13 +44,41 @@ public class EspecialistaPanelController {
     }
 
     @GetMapping("/citas")
-    public String citas(@RequestParam(defaultValue = "0") int semana, HttpSession session, Model model) {
+    public String citas(
+            @RequestParam(required = false) Integer anio,
+            @RequestParam(required = false) Integer numeroSemana,
+            HttpSession session, Model model) {
         Long empleadoId = empleadoIdSesion(session);
+        
+        java.time.LocalDate hoy = java.time.LocalDate.now();
+        if (anio == null || numeroSemana == null) {
+            anio = hoy.get(java.time.temporal.IsoFields.WEEK_BASED_YEAR);
+            numeroSemana = hoy.get(java.time.temporal.IsoFields.WEEK_OF_WEEK_BASED_YEAR);
+        }
+        
+        java.time.LocalDate currentLunes = hoy
+                .with(java.time.temporal.IsoFields.WEEK_BASED_YEAR, anio)
+                .with(java.time.temporal.IsoFields.WEEK_OF_WEEK_BASED_YEAR, numeroSemana)
+                .with(java.time.DayOfWeek.MONDAY);
+
+        java.time.LocalDate prevLunes = currentLunes.minusWeeks(1);
+        int prevAnio = prevLunes.get(java.time.temporal.IsoFields.WEEK_BASED_YEAR);
+        int prevSemana = prevLunes.get(java.time.temporal.IsoFields.WEEK_OF_WEEK_BASED_YEAR);
+
+        java.time.LocalDate nextLunes = currentLunes.plusWeeks(1);
+        int nextAnio = nextLunes.get(java.time.temporal.IsoFields.WEEK_BASED_YEAR);
+        int nextSemana = nextLunes.get(java.time.temporal.IsoFields.WEEK_OF_WEEK_BASED_YEAR);
+
         model.addAttribute("active", "citas");
-        model.addAttribute("semana", semana);
+        model.addAttribute("numeroSemana", numeroSemana);
+        model.addAttribute("anioSemana", anio);
+        model.addAttribute("prevAnio", prevAnio);
+        model.addAttribute("prevSemana", prevSemana);
+        model.addAttribute("nextAnio", nextAnio);
+        model.addAttribute("nextSemana", nextSemana);
         model.addAttribute("dias", panelCitaService.diasSemana());
-        model.addAttribute("citasPorDia", panelCitaService.citasPorDia(empleadoId, semana));
-        model.addAttribute("citasData", panelCitaService.listarCitas(empleadoId, semana));
+        model.addAttribute("citasPorDia", panelCitaService.citasPorDia(empleadoId, anio, numeroSemana));
+        model.addAttribute("citasData", panelCitaService.listarCitas(empleadoId, anio, numeroSemana));
         return "especialista/citas";
     }
 

@@ -180,8 +180,8 @@ public class CitaService {
         List<Cita> citasFuturas = citaRepository.findByEmpleadoIdAndFechaGreaterThanEqual(empleadoId, hoy);
         
         return citasFuturas.stream()
-                .filter(c -> c.getFecha() != null && c.getHora() != null)
-                .map(c -> c.getFecha().toString() + " " + c.getHora().toString())
+                .filter(c -> c.getFecha() != null && c.getHora() != null && (c.getEstado() == null || !c.getEstado().equalsIgnoreCase("cancelada")))
+                .map(c -> String.format("%s %02d:%02d", c.getFecha().toString(), c.getHora().getHour(), c.getHora().getMinute()))
                 .toList();
     }
 }

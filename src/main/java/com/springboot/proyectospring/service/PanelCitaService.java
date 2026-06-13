@@ -33,17 +33,20 @@ public class PanelCitaService {
         return List.of("Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado");
     }
 
-    public List<CitaPanelDto> listarCitas(Long empleadoId, int semanaOffset) {
+    public List<CitaPanelDto> listarCitas(Long empleadoId, int anio, int numeroSemana) {
         LocalDate hoy = LocalDate.now();
-        LocalDate lunes = hoy.with(DayOfWeek.MONDAY).plusWeeks(semanaOffset);
+        LocalDate lunes = hoy
+                .with(java.time.temporal.IsoFields.WEEK_BASED_YEAR, anio)
+                .with(java.time.temporal.IsoFields.WEEK_OF_WEEK_BASED_YEAR, numeroSemana)
+                .with(DayOfWeek.MONDAY);
         LocalDate sabado = lunes.plusDays(5);
         return citaRepository.findByEmpleadoAndRangoFechas(empleadoId, lunes, sabado).stream()
                 .map(this::toDto)
                 .toList();
     }
 
-    public List<List<CitaPanelDto>> citasPorDia(Long empleadoId, int semanaOffset) {
-        List<CitaPanelDto> citas = listarCitas(empleadoId, semanaOffset);
+    public List<List<CitaPanelDto>> citasPorDia(Long empleadoId, int anio, int numeroSemana) {
+        List<CitaPanelDto> citas = listarCitas(empleadoId, anio, numeroSemana);
         List<List<CitaPanelDto>> porDia = new ArrayList<>();
         for (int d = 0; d < 6; d++) {
             final int dia = d;

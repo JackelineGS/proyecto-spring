@@ -7,7 +7,7 @@
 
 .panel-header {
     border-bottom: 1px solid var(--border);
-    background: rgba(255, 255, 255, 0.9);
+    background: rgba(234, 244, 234, 0.9);
     backdrop-filter: blur(8px);
     position: sticky;
     top: 0;
@@ -90,8 +90,8 @@
 }
 
 .panel-nav-link.active {
-    background: rgba(3, 2, 19, 0.08);
-    color: var(--primary);
+    background: var(--secondary);
+    color: var(--foreground);
 }
 
 .panel-content {

@@ -202,11 +202,11 @@
                 alert('Debes consultar tu DNI para cargar tus datos antes de continuar.');
                 return false;
             }
-            var contacto = ['fechaNacimiento', 'celular', 'correo'];
+            var contacto = ['celular', 'correo'];
             for (var i = 0; i < contacto.length; i++) {
                 var field = reservaForm.querySelector('[name="' + contacto[i] + '"]');
                 if (!field || !field.value.trim()) {
-                    alert('Completa tus datos (fecha de nacimiento, celular y correo).');
+                    alert('Completa tus datos (celular y correo).');
                     return false;
                 }
             }
@@ -263,7 +263,7 @@
         
         Promise.all([
             fetch('/api/horarios/' + empleadoId).then(r => r.json()),
-            fetch('/api/horarios-ocupados/' + empleadoId).then(r => r.json())
+            fetch('/api/horarios-ocupados/' + empleadoId + '?t=' + new Date().getTime()).then(r => r.json())
         ])
         .then(function (resultados) {
             horariosPorDiaCache = resultados[0];
