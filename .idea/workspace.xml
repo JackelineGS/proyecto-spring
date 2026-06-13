@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="6d8c8ee0-402b-4575-a919-70f0012f0e19" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/springboot/proyectospring/controller/EspecialistaPanelController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/springboot/proyectospring/controller/EspecialistaPanelController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/springboot/proyectospring/service/CitaService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/springboot/proyectospring/service/CitaService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/springboot/proyectospring/service/PanelCitaService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/springboot/proyectospring/service/PanelCitaService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/css/panel.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/css/panel.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/css/theme.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/css/theme.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/js/clinic.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/js/clinic.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/especialista/citas.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/especialista/citas.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/public/reservar.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/public/reservar.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/META-INF/spring-configuration-metadata.json" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/META-INF/spring-configuration-metadata.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/springboot/proyectospring/controller/EspecialistaPanelController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/springboot/proyectospring/controller/EspecialistaPanelController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/springboot/proyectospring/service/CitaService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/springboot/proyectospring/service/CitaService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/springboot/proyectospring/service/PanelCitaService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/springboot/proyectospring/service/PanelCitaService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/static/css/panel.css" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/static/css/panel.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/static/css/theme.css" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/static/css/theme.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/static/js/clinic.js" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/static/js/clinic.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/templates/especialista/citas.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/templates/especialista/citas.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/templates/public/reservar.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/templates/public/reservar.html" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "customColor": "",
+  "associatedIndex": 8
+}]]></component>
+  <component name="ProjectId" id="3F34SvKcLWcoZcMyo8ZMe3bqhLG" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "Application.ProyectoSpringApplication.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "project__v4",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/ec/Documents/proyecto-spring"
+  }
+}]]></component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="6d8c8ee0-402b-4575-a919-70f0012f0e19" name="Changes" comment="" />
+      <created>1781290423501</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1781290423501</updated>
+    </task>
+    <servers />
+  </component>
+</project>
