@@ -43,7 +43,7 @@
                         <button th:each="slot : ${slots}"
                                 type="button"
                                 th:data-time="${slot}"
-                                th:classappend="${entrada.value.contains(slot)} ? 'border-primary bg-primary text-primary-foreground is-active' : 'border-border hover:border-primary/50'"
+                                th:classappend="${entrada.value.contains(slot)} ? 'border-black bg-black text-white is-active' : 'border-border hover:border-primary/50'"
                                 class="slot-btn px-3 py-1.5 rounded-lg border transition flex items-center gap-1.5 text-sm"
                                 onclick="toggleSlot(this)">
                             <i data-lucide="plus" class="icon-plus w-3 h-3"></i>
@@ -72,10 +72,10 @@
     function toggleSlot(btn) {
         const isActive = btn.classList.contains('is-active');
         if (isActive) {
-            btn.classList.remove('border-primary', 'bg-primary', 'text-primary-foreground', 'is-active');
+            btn.classList.remove('border-black', 'bg-black', 'text-white', 'is-active');
             btn.classList.add('border-border');
         } else {
-            btn.classList.add('border-primary', 'bg-primary', 'text-primary-foreground', 'is-active');
+            btn.classList.add('border-black', 'bg-black', 'text-white', 'is-active');
             btn.classList.remove('border-border');
         }
         actualizarContadorDia(btn.closest('.day-card'));
@@ -100,10 +100,10 @@
         totalButtons.forEach(btn => {
             const isActive = btn.classList.contains('is-active');
             if (marcar && !isActive) {
-                btn.classList.add('border-primary', 'bg-primary', 'text-primary-foreground', 'is-active');
+                btn.classList.add('border-black', 'bg-black', 'text-white', 'is-active');
                 btn.classList.remove('border-border');
             } else if (!marcar && isActive) {
-                btn.classList.remove('border-primary', 'bg-primary', 'text-primary-foreground', 'is-active');
+                btn.classList.remove('border-black', 'bg-black', 'text-white', 'is-active');
                 btn.classList.add('border-border');
             }
         });
