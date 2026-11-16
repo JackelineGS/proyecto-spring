@@ -1,0 +1,33 @@
+0. Prerrequisito: la app debe estar corriendo
+
+cd /home/vboxuser/Proyecto_Sistemas_Operativos
+export JAVA_HOME=/home/vboxuser/jdk/jdk-21.0.13+9
+export PATH="$JAVA_HOME/bin:$PATH"
+java -jar target/proyecto-spring-0.0.1-SNAPSHOT.jar
+
+(déjala corriendo en esa terminal; los ataques se lanzan desde otra pestaña de terminal, en la misma VM, mientras htop corre en una tercera)
+
+
+Ataque 1 — Robo de secretos
+
+cd /home/vboxuser/Proyecto_Sistemas_Operativos
+./ataque1.sh
+
+
+Ataque 2 — Ejecución en /tmp
+
+cd /home/vboxuser/Proyecto_Sistemas_Operativos
+./ataque2.sh
+
+
+Ataque 3 — Saturación (DoS)
+
+cd /home/vboxuser/Proyecto_Sistemas_Operativos
+./ataque3.sh
+
+
+
+APAGAR APLICACION WEB:
+
+kill $(ss -tlnp 2>/dev/null | grep 8080 | grep -oP 'pid=\K[0-9]+')
+pkill -f 'proyecto-spring-0.0.1-SNAPSHOT.jar'
